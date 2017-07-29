@@ -49,11 +49,10 @@ def main():
         config_file = os.path.join(root, 'configs', '{}.json'.format(args.algorithm))
         if not os.path.exists(config_file):
             raise ValueError("No configuration found: {}".format(args.algorithm))
-        if not args.output:
-            benchmark_file = os.path.join(root, 'benchmarks', '{}_{}.pkl'.format(
-                args.algorithm, args.gym_id
-            ))
-    elif not args.output:
+        benchmark_file = os.path.join(root, 'benchmarks', '{}_{}.pkl'.format(
+            args.algorithm, args.gym_id
+        ))
+    else:
         benchmark_file = os.path.join(root, 'benchmarks', '{}_{}.pkl'.format(
             args.algorithm.replace('.', '_').replace('/', '__'), args.gym_id
         ))
@@ -90,7 +89,6 @@ def main():
             logger.info("Average of last 500 rewards: {}".format(sum(r.episode_rewards[-500:]) / 500))
             logger.info("Average of last 100 rewards: {}".format(sum(r.episode_rewards[-100:]) / 100))
         return True
-
 
     logger.info("Starting benchmark for agent {agent} and Environment '{env}'".format(agent=agent, env=environment))
     logger.info("Results will be saved in {}".format(os.path.abspath(benchmark_file)))
