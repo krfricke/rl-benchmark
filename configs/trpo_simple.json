@@ -1,0 +1,37 @@
+{
+  "agent": "TRPOAgent",
+  "episodes": 1000,
+  "max_timesteps": 200,
+
+  "log_level": "info",
+  "batch_size": 100,
+  "discount": 0.97,
+  "baseline": {
+    "type": "mlp",
+    "size": 32,
+    "hidden_layers": 2,
+    "epochs": 10,
+    "update_batch_size" : 32
+  },
+  "generalized_advantage_estimation": true,
+  "gae_lambda": 0.97,
+  "normalize_advantage" : false,
+  "override_line_search": false,
+  "cg_damping" : 0.01,
+  "line_search_steps" : 20,
+  "max_kl_divergence": 0.005,
+  "cg_iterations" : 20,
+
+  "network": [
+    {
+      "type": "dense",
+      "size": 32,
+      "activation": "tanh"
+    },
+    {
+      "type": "dense",
+      "size": 32,
+      "activation": "tanh"
+    }
+  ]
+}
