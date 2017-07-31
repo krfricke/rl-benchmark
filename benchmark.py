@@ -19,7 +19,7 @@ TensorForce benchmarking.
 Usage:
 
 ```bash
-python benchmark.py [-o output] <algorithm> <gym_id>
+python benchmark.py [--output output] [--append] <algorithm> <gym_id>
 ```
 
 `algorithm` specifies which config file to use. You can pass the path to a valid json config file, or a string
@@ -28,6 +28,23 @@ indicating which prepared config to use (e.g. `dqn2015`).
 `gym_id` should be a valid [OpenAI gym ID](https://gym.openai.com/envs)
 
 `output` is an optional parameter to set the output (pickle) file. If omitted, output will be saved in `./benchmarks`.
+
+`append` is an optional parameter which indicates if data should be appended to an existing output file.
+
+The resulting output file is a pickled python list, where each item is a dict containing benchmark data.
+
+The dict has the following keys:
+
+* `episode_rewards`: list containing observed total rewards for each episode.
+* `episode_lengths`: list containing total timesteps for each episode.
+* `initial_reset_time`: integer indicating starting timestamp (usually 0).
+* `episode_end_times`: list containing observed end times relativ to `initial_reset_time` (not working at the moment).
+* `info`: dict containing meta information about the experiment:
+    * `agent`: TensorForce agent used in the experiment.
+    * `episodes`: Episode count configuration item.
+    * `max_timesteps`: Max timesteps configuration item.
+    * `environment_name`: Environment name configuration item.
+* `config`: `Configuration` object containing the original configuration passed to the benchmarking script.
 
 """
 
@@ -53,8 +70,13 @@ def main():
     parser.add_argument('algorithm', help="Algorithm name (config file)")
     parser.add_argument('gym_id', help="ID of the gym environment")
     parser.add_argument('-o', '--output', help="output file (pickle pkl)")
+    parser.add_argument('-a', '--append', action='store_true', default=False,
+                        help="Append data to existing pickle file?")
 
     args = parser.parse_args()
+
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
 
     root = os.path.dirname(os.path.realpath(__file__))
 
@@ -73,9 +95,21 @@ def main():
 
     if args.output:
         benchmark_file = args.output
+    else:
+        if not os.path.isdir(os.path.join(root, 'benchmarks')):
+            os.mkdir(os.path.join(root, 'benchmarks'), 0o755)
 
-    if not os.path.isdir(os.path.join(root, 'benchmarks')):
-        os.mkdir(os.path.join(root, 'benchmarks'), 0o755)
+    if os.path.isfile(benchmark_file):
+        logger.debug("Found existing benchmark file: {}".format(benchmark_file))
+
+        if not args.append:
+            raise ValueError("Output file already exists (and --apend was not passed), aborting.")
+
+        logger.info("Loading data from output file to append to...")
+        with open(benchmark_file, 'rb') as f:
+            pickle_data = pickle.load(f)
+    else:
+        pickle_data = list()
 
     config = Configuration.from_json(config_file)
 
@@ -95,9 +129,6 @@ def main():
     )
 
     report_episodes = 1
-
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
 
     def episode_finished(r):
         if r.episode % report_episodes == 0:
@@ -130,8 +161,10 @@ def main():
 
     environment.close()
 
+    pickle_data.append(benchmark_data)
+
     logger.info("Saving benchmark data of {} episodes to {}".format(len(runner.episode_rewards), benchmark_file))
-    pickle.dump(benchmark_data, open(benchmark_file, 'wb'))
+    pickle.dump(pickle_data, open(benchmark_file, 'wb'))
     logger.info("All done.")
 
 if __name__ == '__main__':
