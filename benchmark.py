@@ -65,10 +65,13 @@ def main():
 
     config = Configuration.from_json(config_file)
 
+    original_config = config.copy()  # Until reinforceio/tensorforce#54 is fixed, use a copy of the config
+
     config.network = layered_network_builder(config.network)
     environment = OpenAIGym(args.gym_id)
 
     config.default(dict(states=environment.states, actions=environment.actions))
+
     agent = agents[config.agent](config=config)
 
     runner = Runner(
@@ -101,7 +104,14 @@ def main():
         episode_rewards=runner.episode_rewards,
         episode_lengths=runner.episode_lengths,
         initial_reset_time=0,
-        episode_end_times=list()
+        episode_end_times=list(),
+        info=dict(
+            agent=config.agent,
+            episodes=config.episodes,
+            max_timesteps=config.max_timesteps,
+            environment_name=args.gym_id
+        ),
+        config=original_config
     )
 
     environment.close()
