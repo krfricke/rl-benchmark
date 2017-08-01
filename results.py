@@ -80,7 +80,7 @@ def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-i', '--input', action='append', nargs=2, metavar=('file', 'name'),
-                        help="Input file(s): <file> <description>")
+                        help="Input file(s): <file> <name>")
     parser.add_argument('-o', '--output', default="output.png", help="output file (image png)")
 
     args = parser.parse_args()
