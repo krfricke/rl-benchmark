@@ -103,7 +103,7 @@ def main():
         logger.debug("Found existing benchmark file: {}".format(benchmark_file))
 
         if not args.append:
-            raise ValueError("Output file already exists (and --apend was not passed), aborting.")
+            raise ValueError("Output file already exists (and --append was not passed), aborting.")
 
         logger.info("Loading data from output file to append to...")
         with open(benchmark_file, 'rb') as f:
