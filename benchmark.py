@@ -109,9 +109,9 @@ def main():
 
         logger.info("Loading data from output file to append to...")
         with open(benchmark_file, 'rb') as f:
-            pickle_data = pickle.load(f)
+            benchmark_data = pickle.load(f)
     else:
-        pickle_data = list()
+        benchmark_data = list()
 
     config = Configuration.from_json(config_file)
 
@@ -147,7 +147,7 @@ def main():
 
     logger.info("Learning finished. Total episodes: {ep}".format(ep=runner.episode))
 
-    benchmark_data = dict(
+    experiment_data = dict(
         episode_rewards=runner.episode_rewards,
         episode_lengths=runner.episode_lengths,
         initial_reset_time=0,
@@ -163,10 +163,10 @@ def main():
 
     environment.close()
 
-    pickle_data.append(benchmark_data)
+    benchmark_data.append(experiment_data)
 
     logger.info("Saving benchmark data of {} episodes to {}".format(len(runner.episode_rewards), benchmark_file))
-    pickle.dump(pickle_data, open(benchmark_file, 'wb'))
+    pickle.dump(benchmark_data, open(benchmark_file, 'wb'))
     logger.info("All done.")
 
 if __name__ == '__main__':
