@@ -63,6 +63,8 @@ from tensorforce.core.networks import layered_network_builder
 from tensorforce.execution import Runner
 from tensorforce.contrib.openai_gym import OpenAIGym
 
+logging.basicConfig()
+
 
 def main():
     parser = argparse.ArgumentParser()
