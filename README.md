@@ -8,6 +8,8 @@ In this repository we provide scripts for creating and analyzing benchmarks
 Creating benchmarks
 -------------------
 
+You can easily create benchmarks using pre-supplied config files or your own configurations.
+
 ```bash
 python benchmark.py [--output output] [--append] <algorithm> <gym_id>
 ```
@@ -21,3 +23,18 @@ indicating which prepared config to use (e.g. `dqn2015`).
 
 `append` is an optional parameter which indicates if data should be appended to an existing output file.
 
+Analyzing benchmarks
+--------------------
+
+At the moment, we provide plotting of the results obtained from our benchmarking script.
+
+```bash
+python results.py [--output output] [--input <file> <name>] [--input <file> <name> ...]
+```
+
+`input` expects two parameters. `file` points to a pickle file (pkl) containing experiment data (e.g. created by
+running `benchmark.py`). `name` is a string containing the label for the plot.
+
+`output` is an optional parameter to set the output (png) file. If omitted, output will be saved as `./output.png`.
+
+The resulting output file is a PNG image containing plots for rewards by episodes and rewards by timesteps.

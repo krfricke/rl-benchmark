@@ -9,6 +9,7 @@
 /log_*
 /logs_async
 /docs/_*
-*.pkl
 tf_worker_*.txt
 .DS_Store
+*.pkl
+*.png
