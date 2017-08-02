@@ -78,7 +78,7 @@ def rewards_by_timesteps(rewards, timesteps, lengths=None, cut_x=1e12):
     timesteps, rewards = timesteps[timesteps < cut_x], rewards[timesteps < cut_x]
 
     if cut_x > 200:
-        timesteps = n_step_average(timesteps, 200)
+        timesteps = np.linspace(0, cut_x, 200)
         rewards = n_step_average(rewards, 200)
 
     return timesteps, rewards
