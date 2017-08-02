@@ -48,24 +48,63 @@ import seaborn as sns
 logging.basicConfig()
 
 
+def n_step_average(data, n):
+    """
+    Average data over n steps.
+
+    Args:
+        data: np.array containing the ata
+        n: steps to average over
+
+    Returns: np.array of size n containing the average of the respective bins
+
+    """
+    cut = data[0:len(data)-len(data)%n]  # cut array so it's divisible by n
+    return np.mean(cut.reshape(-1, len(data)//n), axis=1)
+
+
 def rewards_by_episodes(rewards, timesteps=None, lengths=None, cut_x=1e12):
     episodes = np.arange(len(rewards))
     episodes, rewards = episodes[episodes < cut_x], rewards[episodes < cut_x]
+
+    if cut_x > 200:
+        episodes = np.arange(200)
+        rewards = n_step_average(rewards, 200)
+
     return episodes, rewards
 
 
 def rewards_by_timesteps(rewards, timesteps, lengths=None, cut_x=1e12):
     timesteps, rewards = timesteps[timesteps < cut_x], rewards[timesteps < cut_x]
+
+    if cut_x > 200:
+        timesteps = n_step_average(timesteps, 200)
+        rewards = n_step_average(rewards, 200)
+
     return timesteps, rewards
 
 
 def to_timeseries(full_data, x_label='Episode', y_label='Average Episode Reward',
                   target=rewards_by_episodes, cut_x=1e12, smooth=0):
+    """
+    Convert benchmark data to timeseries data, plottable my mathplotlib.
+
+    Args:
+        full_data: list of tuples (of lists) for each experiment (lengths, timesteps (cumulated), rewards)
+        x_label: label for the x axis (time)
+        y_label: label for the y axis (values)
+        target: callback returning processed x and y values
+        cut_x: maximum x value to cut (passed to target)
+        smooth: used to np.ewm(span=smooth) (smooth curve)
+
+    Returns: pd.DataFrame
+
+    """
     data_experiments, data_times, data_values = [], [], []
 
     for experiment_id, (lengths, timesteps, rewards) in enumerate(full_data):
         if smooth > 0:
-            rewards = pd.Series(rewards).ewm(span=smooth).mean()
+            rewards = np.array(pd.Series(rewards).ewm(span=smooth).mean())
 
         x, y = target(rewards, timesteps=timesteps, lengths=lengths, cut_x=cut_x)
 
@@ -129,11 +168,13 @@ def main():
             least_episodes = min(least_episodes, len(rewards))
             least_timesteps = min(least_timesteps, timesteps[-1])
 
+        # TODO: Maybe limit all input datasets to least_episodes / least_timesteps?
+
         ax_index = -1
 
         # Plot average rewards by episodes
         re_plot = to_timeseries(full_data, x_label="Episode", y_label="Average Episode Reward",
-                                target=rewards_by_episodes, cut_x=least_episodes, smooth=20)
+                                target=rewards_by_episodes, cut_x=least_episodes, smooth=10)
 
         ax_index += 1
         ax = axes[ax_index]
@@ -147,7 +188,7 @@ def main():
 
         # Plot average rewards by timesteps
         rt_plot = to_timeseries(full_data, x_label="Timestep", y_label="Average Episode Reward",
-                                target=rewards_by_timesteps, cut_x=least_timesteps, smooth=20)
+                                target=rewards_by_timesteps, cut_x=least_timesteps, smooth=10)
 
         ax_index += 1
         ax = axes[ax_index]
