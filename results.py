@@ -63,7 +63,7 @@ def n_step_average(data, n):
     return np.mean(cut.reshape(-1, len(data)//n), axis=1)
 
 
-def rewards_by_episodes(rewards, timesteps=None, lengths=None, cut_x=1e12):
+def rewards_by_episodes(rewards, timesteps=None, lengths=None, seconds=None, cut_x=1e12):
     episodes = np.arange(len(rewards))
     episodes, rewards = episodes[episodes < cut_x], rewards[episodes < cut_x]
 
@@ -74,7 +74,7 @@ def rewards_by_episodes(rewards, timesteps=None, lengths=None, cut_x=1e12):
     return episodes, rewards
 
 
-def rewards_by_timesteps(rewards, timesteps, lengths=None, cut_x=1e12):
+def rewards_by_timesteps(rewards, timesteps, lengths=None, seconds=None, cut_x=1e12):
     timesteps, rewards = timesteps[timesteps < cut_x], rewards[timesteps < cut_x]
 
     if cut_x > 200:
@@ -82,6 +82,17 @@ def rewards_by_timesteps(rewards, timesteps, lengths=None, cut_x=1e12):
         rewards = n_step_average(rewards, 200)
 
     return timesteps, rewards
+
+
+def rewards_by_seconds(rewards, timesteps, lengths=None, seconds=None, cut_x=1e12):
+    cut_x = int(cut_x)
+
+    seconds, rewards = seconds[seconds < cut_x], rewards[seconds < cut_x]
+
+    seconds = np.linspace(0, cut_x, cut_x)
+    rewards = n_step_average(rewards, cut_x)
+
+    return seconds, rewards
 
 
 def to_timeseries(full_data, x_label='Episode', y_label='Average Episode Reward',
@@ -102,11 +113,11 @@ def to_timeseries(full_data, x_label='Episode', y_label='Average Episode Reward'
     """
     data_experiments, data_times, data_values = [], [], []
 
-    for experiment_id, (lengths, timesteps, rewards) in enumerate(full_data):
+    for experiment_id, (lengths, timesteps, seconds, rewards) in enumerate(full_data):
         if smooth > 0:
             rewards = np.array(pd.Series(rewards).ewm(span=smooth).mean())
 
-        x, y = target(rewards, timesteps=timesteps, lengths=lengths, cut_x=cut_x)
+        x, y = target(rewards, timesteps=timesteps, seconds=seconds, lengths=lengths, cut_x=cut_x)
 
         data_times.extend(x)
         data_values.extend(y)
@@ -139,7 +150,7 @@ def main():
 
     # plot_cols = min(len(data.keys()) * 2, 4)
     # plot_rows = (len(data.keys()) * 2 + plot_cols - 1) // plot_cols
-    plot_cols = 2
+    plot_cols = 3
     plot_rows = 1
 
     figure, axes = plt.subplots(ncols=plot_cols, nrows=plot_rows, figsize=(plot_cols * 6, plot_rows * 6))
@@ -156,17 +167,20 @@ def main():
 
         logger.info("Plotting average rewards for {} in {}".format(name, color))
 
-        least_timesteps = least_episodes = int(1e12)
+        least_episodes = least_timesteps = least_seconds = int(1e12)
         full_data = list()
         logger.info("Found {} experiments.".format(len(benchmark_data)))
         for experiment_data in benchmark_data:
             lengths = np.array(experiment_data['episode_lengths'])  # episode lengths
             timesteps = np.cumsum(lengths)  # cumulative episode lengths as timesteps
             rewards = np.array(experiment_data['episode_rewards'])  # turn rewards into numpy array
-            full_data.append((lengths, timesteps, rewards))
+            seconds = np.cumsum(experiment_data['episode_end_times'])  # cumulative times in seconds
+
+            full_data.append((lengths, timesteps, seconds, rewards))
 
             least_episodes = min(least_episodes, len(rewards))
             least_timesteps = min(least_timesteps, timesteps[-1])
+            least_seconds = min(least_seconds, seconds[-1])
 
         # TODO: Maybe limit all input datasets to least_episodes / least_timesteps?
 
@@ -199,6 +213,21 @@ def main():
         ax_legends[ax_index].append(patch)
 
         figure.add_subplot(plot)
+
+        # Plot average rewards by seconds
+        rs_plot = to_timeseries(full_data, x_label="Seconds", y_label="Average Episode Reward",
+                                target=rewards_by_seconds, cut_x=least_seconds, smooth=10)
+
+        ax_index += 1
+        ax = axes[ax_index]
+
+        plot = sns.tsplot(data=rs_plot, time="Seconds", value="Average Episode Reward", unit="experiment",
+                          ax=ax, ci=[68, 95], color=color)
+
+        ax_legends[ax_index].append(patch)
+
+        figure.add_subplot(plot)
+
 
     for ax_index, ax in enumerate(axes):
         ax.legend(handles=ax_legends[ax_index])

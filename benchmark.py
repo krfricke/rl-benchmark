@@ -151,7 +151,7 @@ def main():
         episode_rewards=runner.episode_rewards,
         episode_lengths=runner.episode_lengths,
         initial_reset_time=0,
-        episode_end_times=list(),
+        episode_end_times=runner.episode_times,
         info=dict(
             agent=config.agent,
             episodes=config.episodes,
