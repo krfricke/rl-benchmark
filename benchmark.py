@@ -57,6 +57,8 @@ import logging
 import os
 import pickle
 
+from six.moves import xrange
+
 from tensorforce import Configuration
 from tensorforce.agents import agents
 from tensorforce.core.networks import layered_network_builder
@@ -72,6 +74,8 @@ def main():
     parser.add_argument('algorithm', help="Algorithm name (config file)")
     parser.add_argument('gym_id', help="ID of the gym environment")
     parser.add_argument('-o', '--output', help="output file (pickle pkl)")
+    parser.add_argument('-x', '--experiments', default=1, type=int,
+                        help="number of times to run the benchmark")
     parser.add_argument('-a', '--append', action='store_true', default=False,
                         help="Append data to existing pickle file?")
 
@@ -143,29 +147,35 @@ def main():
     logger.info("Starting benchmark for agent {agent} and Environment '{env}'".format(agent=agent, env=environment))
     logger.info("Results will be saved in {}".format(os.path.abspath(benchmark_file)))
 
-    runner.run(config.episodes, config.max_timesteps, episode_finished=episode_finished)
+    for i in xrange(args.experiments):
+        environment.reset()
+        agent.reset()
 
-    logger.info("Learning finished. Total episodes: {ep}".format(ep=runner.episode))
+        logger.info("Starting experiment {}".format(i+1))
 
-    experiment_data = dict(
-        episode_rewards=runner.episode_rewards,
-        episode_lengths=runner.episode_lengths,
-        initial_reset_time=0,
-        episode_end_times=runner.episode_times,
-        info=dict(
-            agent=config.agent,
-            episodes=config.episodes,
-            max_timesteps=config.max_timesteps,
-            environment_name=args.gym_id
-        ),
-        config=original_config
-    )
+        runner.run(config.episodes, config.max_timesteps, episode_finished=episode_finished)
+
+        logger.info("Learning finished. Total episodes: {ep}".format(ep=runner.episode))
+
+        experiment_data = dict(
+            episode_rewards=runner.episode_rewards,
+            episode_lengths=runner.episode_lengths,
+            initial_reset_time=0,
+            episode_end_times=runner.episode_times,
+            info=dict(
+                agent=config.agent,
+                episodes=config.episodes,
+                max_timesteps=config.max_timesteps,
+                environment_name=args.gym_id
+            ),
+            config=original_config
+        )
+
+        benchmark_data.append(experiment_data)
+
 
     environment.close()
-
-    benchmark_data.append(experiment_data)
-
-    logger.info("Saving benchmark data of {} episodes to {}".format(len(runner.episode_rewards), benchmark_file))
+    logger.info("Saving benchmark to {}".format(benchmark_file))
     pickle.dump(benchmark_data, open(benchmark_file, 'wb'))
     logger.info("All done.")
 
