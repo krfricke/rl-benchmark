@@ -68,7 +68,7 @@ def rewards_by_episodes(rewards, timesteps=None, lengths=None, seconds=None, cut
     episodes, rewards = episodes[episodes < cut_x], rewards[episodes < cut_x]
 
     if cut_x > 200:
-        episodes = np.arange(200)
+        episodes = np.linspace(0, cut_x, 200)
         rewards = n_step_average(rewards, 200)
 
     return episodes, rewards
