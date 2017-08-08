@@ -1,6 +1,6 @@
 {
   "agent": "VPGAgent",
-  "episodes": 2200,
+  "episodes": 5000,
   "max_timesteps": 200,
 
   "log_level": "info",

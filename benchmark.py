@@ -121,19 +121,6 @@ def main():
 
     original_config = config.copy()  # Until reinforceio/tensorforce#54 is fixed, use a copy of the config
 
-    config.network = layered_network_builder(config.network)
-    environment = OpenAIGym(args.gym_id)
-
-    config.default(dict(states=environment.states, actions=environment.actions))
-
-    agent = agents[config.agent](config=config)
-
-    runner = Runner(
-        agent=agent,
-        environment=environment,
-        repeat_actions=1
-    )
-
     report_episodes = 1
 
     def episode_finished(r):
@@ -144,10 +131,26 @@ def main():
             logger.info("Average of last 100 rewards: {}".format(sum(r.episode_rewards[-100:]) / 100))
         return True
 
-    logger.info("Starting benchmark for agent {agent} and Environment '{env}'".format(agent=agent, env=environment))
+    logger.info("Starting benchmark for agent {agent} and Environment '{env}'".format(agent=config.agent,
+                                                                                      env=args.gym_id))
     logger.info("Results will be saved in {}".format(os.path.abspath(benchmark_file)))
 
     for i in xrange(args.experiments):
+        config = original_config.copy()
+
+        config.network = layered_network_builder(config.network)
+        environment = OpenAIGym(args.gym_id)
+
+        config.default(dict(states=environment.states, actions=environment.actions))
+
+        agent = agents[config.agent](config=config)
+
+        runner = Runner(
+            agent=agent,
+            environment=environment,
+            repeat_actions=1
+        )
+
         environment.reset()
         agent.reset()
 
@@ -173,8 +176,8 @@ def main():
 
         benchmark_data.append(experiment_data)
 
+        environment.close()
 
-    environment.close()
     logger.info("Saving benchmark to {}".format(benchmark_file))
     pickle.dump(benchmark_data, open(benchmark_file, 'wb'))
     logger.info("All done.")
