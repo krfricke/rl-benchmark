@@ -59,8 +59,11 @@ def n_step_average(data, n):
     Returns: np.array of size n containing the average of the respective bins
 
     """
+    if len(data) < n:
+        n = len(data)
+
     cut = data[0:len(data)-len(data)%n]  # cut array so it's divisible by n
-    return np.mean(cut.reshape(-1, len(data)//n), axis=1)
+    return np.mean(cut.reshape(-1, len(data) // n), axis=1)
 
 
 def rewards_by_episodes(rewards, timesteps=None, lengths=None, seconds=None, cut_x=1e12):
@@ -89,8 +92,12 @@ def rewards_by_seconds(rewards, timesteps, lengths=None, seconds=None, cut_x=1e1
 
     seconds, rewards = seconds[seconds < cut_x], rewards[seconds < cut_x]
 
-    seconds = np.linspace(0, cut_x, cut_x)
-    rewards = n_step_average(rewards, cut_x)
+    if cut_x > len(rewards):
+        seconds = np.linspace(0, cut_x, 200)
+        rewards = n_step_average(rewards, 200)
+    else:
+        seconds = np.linspace(0, cut_x, cut_x)
+        rewards = n_step_average(rewards, cut_x)
 
     return seconds, rewards
 
