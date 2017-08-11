@@ -11,7 +11,7 @@ Creating benchmarks
 You can easily create benchmarks using pre-supplied config files or your own configurations.
 
 ```bash
-python benchmark.py [--output output] [--append] <algorithm> <gym_id>
+python benchmark.py [--output output] [--experiments num_experiments] [--append] <algorithm> <gym_id>
 ```
 
 `algorithm` specifies which config file to use. You can pass the path to a valid json config file, or a string
@@ -20,6 +20,8 @@ indicating which prepared config to use (e.g. `dqn2015`).
 `gym_id` should be a valid [OpenAI gym ID](https://gym.openai.com/envs)
 
 `output` is an optional parameter to set the output (pickle) file. If omitted, output will be saved in `./benchmarks`.
+
+`experiments` indicates how often the experiment should be run.
 
 `append` is an optional parameter which indicates if data should be appended to an existing output file.
 
@@ -38,3 +40,26 @@ running `benchmark.py`). `name` is a string containing the label for the plot.
 `output` is an optional parameter to set the output (png) file. If omitted, output will be saved as `./output.png`.
 
 The resulting output file is a PNG image containing plots for rewards by episodes and rewards by timesteps.
+
+Using Docker
+------------
+
+We provide a Docker image for benchmarking. The image currently only support creating benchmarks, not analyzing them.
+
+Get started by pulling our docker image:
+
+```bash
+docker pull reinforceio/tensorforce-benchmark
+```
+
+Afterwards, you can start your benchmark. You should provide a host directory for the output files:
+
+```bash
+docker run -v /host/output:/benchmarks reinforceio/tensorforce-benchmark trpo_simple CartPole-v0
+```
+
+To provide your own configuration files, you can mount another host directory and pass the configuration file name as a parameter:
+
+```bash
+docker run -v /host/configs:/configs -v /host/output:/benchmarks reinforceio/tensorforce-benchmark my_config CartPole-v0
+```
