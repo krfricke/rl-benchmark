@@ -4,10 +4,10 @@
   "max_timesteps": 200,
 
   "log_level": "info",
+
   "batch_size": 4096,
   "discount": 0.99,
-
-  "generalized_advantage_estimation": false,
+  "gae_rewards": false,
   "gae_lambda": 0.97,
   "normalize_advantage" : false,
   "learning_rate" : 0.001,

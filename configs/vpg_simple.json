@@ -24,9 +24,8 @@
     "update_batch_size" : 128
   },
 
-  "generalized_advantage_estimation": false,
-  "gae_lambda": 0.97,
-  "normalize_advantage": true,
+  "gae_rewards": false,
+  "normalize_rewards": true,
 
   "network": [
       {
