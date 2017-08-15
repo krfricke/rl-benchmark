@@ -235,9 +235,12 @@ def main():
 
         figure.add_subplot(plot)
 
-
     for ax_index, ax in enumerate(axes):
-        ax.legend(handles=ax_legends[ax_index])
+        ax.legend(handles=ax_legends[ax_index], loc=4)
+        plt.sca(ax)
+        plt.xticks(rotation=45)
+
+    plt.tight_layout()
 
     logger.info("Saving figure to {}".format(args.output))
     figure.savefig(args.output)

@@ -41,6 +41,9 @@ running `benchmark.py`). `name` is a string containing the label for the plot.
 
 The resulting output file is a PNG image containing plots for rewards by episodes and rewards by timesteps.
 
+![example output](https://user-images.githubusercontent.com/14904111/29328011-52778284-81f1-11e7-8f70-6554ca9388ed.png)
+
+
 Using Docker
 ------------
 
