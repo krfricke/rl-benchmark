@@ -63,3 +63,32 @@ To provide your own configuration files, you can mount another host directory an
 ```bash
 docker run -v /host/configs:/configs -v /host/output:/benchmarks reinforceio/tensorforce-benchmark my_config CartPole-v0
 ```
+
+### Using tensorflow-gpu
+
+We also provide a Docker image utilizing `tensorflow-gpu` on CUDA. You will need [nvidia-docker](https://github.com/NVIDIA/nvidia-docker) to run this image.
+
+First, pull the gpu image:
+
+```bash
+docker pull reinforceio/tensorforce-benchmark:latest-gpu
+```
+
+Then, run using `nvidia-docker`:
+
+```bash
+nvidia-docker run -v /host/configs:/configs -v /host/output:/benchmarks reinforceio/tensorforce-benchmark:latest-gpu my_config CartPole-v0
+```
+
+### Building Docker images
+
+You can build the Docker images yourself using these commands:
+
+```bash
+# CPU version
+docker build -f Dockerfile -t tensorforce-benchmark:latest .
+
+# GPU version
+nvidia-docker build -f Dockerfile.gpu -t tensorforce-benchmark:latest-gpu .
+```
+
