@@ -1,0 +1,6 @@
+Pillow
+scipy
+numpy
+tensorflow-gpu>=1.2.1
+gym
+git+https://github.com/reinforceio/tensorforce.git

@@ -1,4 +1,4 @@
-FROM tensorflow/tensorflow:latest
+FROM tensorflow/tensorflow:latest-gpu
 
 MAINTAINER reinforce.io <contact@reinforce.io>
 
@@ -29,7 +29,7 @@ WORKDIR /
 ADD . /
 
 # Add TensorForce dependencies
-RUN pip install -r requirements_benchmark.txt
+RUN pip install -r requirements_benchmark_gpu.txt
 
 RUN [ -d benchmarks ] || mkdir benchmarks && rm -rf benchmarks/*
 
