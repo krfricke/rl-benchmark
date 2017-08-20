@@ -14,6 +14,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python-dev \
     rsync \
     software-properties-common \
+    cmake \
+    swig \
+    zlib1g-dev \
     unzip \
     git \
     && \

@@ -2,5 +2,5 @@ Pillow
 scipy
 numpy
 tensorflow>=1.2.1
-gym
+gym[all]
 git+https://github.com/reinforceio/tensorforce.git
