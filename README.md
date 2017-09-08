@@ -43,7 +43,7 @@ The resulting output file is a PNG image containing plots for rewards by episode
 
 This is a sample output for `CartPole-v0`, comparing VPG, TRPO and PPO (using the configurations provided in `configs`):
 
-![example output](https://user-images.githubusercontent.com/14904111/29328011-52778284-81f1-11e7-8f70-6554ca9388ed.png)
+![example output](https://user-images.githubusercontent.com/14904111/30209005-328ea760-9496-11e7-93fc-80ea00794842.png)
 
 
 Using Docker
