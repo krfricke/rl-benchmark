@@ -18,10 +18,10 @@
 
   "baseline": {
     "type": "mlp",
-    "size": 32,
-    "hidden_layers": 2,
-    "epochs": 5,
-    "update_batch_size" : 128
+    "sizes": [32, 32],
+    "epochs": 1,
+    "update_batch_size" : 512,
+    "learning_rate": 0.01
   },
 
   "gae_rewards": false,

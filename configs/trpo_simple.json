@@ -13,6 +13,14 @@
   "ls_max_backtracks" : 10,
   "ls_accept_ratio": 0.9,
   "ls_override": false,
+  
+  "baseline": {
+    "type": "mlp",
+    "sizes": [32, 32],
+    "epochs": 1,
+    "update_batch_size" : 250,
+    "learning_rate": 0.01
+  },
 
   "network": [
     {

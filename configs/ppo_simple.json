@@ -5,7 +5,7 @@
 
   "log_level": "info",
 
-  "batch_size": 4096,
+  "batch_size": 4000,
   "discount": 0.99,
   "gae_rewards": false,
   "gae_lambda": 0.97,
@@ -15,16 +15,26 @@
   "epochs" : 5,
   "optimizer_batch_size" : 512,
   "loss_clipping" : 0.2,
+  
+  "baseline": {
+    "type": "mlp",
+    "sizes": [32, 32],
+    "epochs": 1,
+    "update_batch_size" : 512,
+    "learning_rate": 0.01
+  },
 
   "network": [
-      {
-          "type": "dense",
-          "size": 32
-      },
-      {
-          "type": "dense",
-          "size": 32
-      }
+    {
+      "type": "dense",
+      "size": 32,
+      "activation": "tanh"
+    },
+    {
+      "type": "dense",
+      "size": 32,
+      "activation": "tanh"
+    }
   ]
 
 }
