@@ -31,6 +31,8 @@ RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
 WORKDIR /
 ADD . /
 
+RUN rm -rf *.png _cmd_*.txt
+
 # Add TensorForce dependencies
 RUN pip install -r requirements_benchmark_gpu.txt
 
