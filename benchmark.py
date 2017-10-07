@@ -31,6 +31,15 @@ indicating which prepared config to use (e.g. `dqn2015`).
 
 `append` is an optional parameter which indicates if data should be appended to an existing output file.
 
+`model` is an optional path for the `tf.train.Saver` class. If empty, model will not be saved.
+
+`save-model <num_episodes>` states after how many episodes the model should be saved. If 0 or omitted,
+model will not be saved.
+
+`load-model <path>` states from which path to load the model (only for the first experiment, if more than one
+experiment should run). If omitted, it does not load a model.
+
+
 The resulting output file is a pickled python list, where each item is a dict containing benchmark data.
 
 The dict has the following keys:

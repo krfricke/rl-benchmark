@@ -11,7 +11,7 @@ Creating benchmarks
 You can easily create benchmarks using pre-supplied config files or your own configurations.
 
 ```bash
-python benchmark.py [--output output] [--experiments num_experiments] [--append] <algorithm> <gym_id>
+python benchmark.py [--output output] [--experiments num_experiments] [--append] [--model <path>] [--save-model <num_episodes>] [--load-model <path>] <algorithm> <gym_id>
 ```
 
 `algorithm` specifies which config file to use. You can pass the path to a valid json config file, or a string
@@ -24,6 +24,12 @@ indicating which prepared config to use (e.g. `dqn2015`).
 `experiments` indicates how often the experiment should be run.
 
 `append` is an optional parameter which indicates if data should be appended to an existing output file.
+
+`model` is an optional path for the `tf.train.Saver` class. If empty, model will not be saved.
+
+`save-model <num_episodes>` states after how many episodes the model should be saved. If 0, model will not be saved.
+
+`load-model <path>` states from which path to load the model (only for the first experiment, if more than one experiment should run). If omitted, it does not load a model.
 
 Analyzing benchmarks
 --------------------
