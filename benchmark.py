@@ -78,6 +78,10 @@ def main():
                         help="number of times to run the benchmark")
     parser.add_argument('-a', '--append', action='store_true', default=False,
                         help="Append data to existing pickle file?")
+    parser.add_argument('-m', '--model', default=None, help="model path")
+    parser.add_argument('-s', '--save-model', default=0, type=int, help="save model every n episodes")
+    parser.add_argument('-l', '--load-model', default=None, help="load model from this file")
+
 
     args = parser.parse_args()
 
@@ -145,10 +149,16 @@ def main():
 
         agent = agents[config.agent](config=config)
 
+        if i == 0 and args.load_model:
+            logger.info("Loading model data from file: {}".format(args.load_model))
+            agent.load_model(args.load_model)
+
         runner = Runner(
             agent=agent,
             environment=environment,
-            repeat_actions=1
+            repeat_actions=1,
+            save_path=args.model,
+            save_episodes=args.save_model
         )
 
         environment.reset()
