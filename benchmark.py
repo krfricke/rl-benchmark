@@ -66,6 +66,8 @@ import logging
 import os
 import pickle
 
+from copy import copy
+
 from six.moves import xrange
 
 from tensorforce import Configuration
@@ -91,6 +93,14 @@ def main():
     parser.add_argument('-s', '--save-model', default=0, type=int, help="save model every n episodes")
     parser.add_argument('-l', '--load-model', default=None, help="load model from this file")
 
+    # TODO: this is not yet documented, as there are some problems with loading from checkpoints at the moment.
+    # For instance, loading from a checkpoint does not set the total_timestep etc in the runner, which can lead to
+    # problems with the exploration and length of a continued run. We need to change the runner class in base
+    # tensorforce to address these issues, which is on our to-do list.
+    parser.add_argument('-C', '--checkpoint', default=None, help="benchmark checkpoint file")
+    parser.add_argument('-E', '--checkpoint-episodes', default=0, type=int,
+                        help="save benchmark checkpoint every n episodes")
+    parser.add_argument('-L', '--load-checkpoint', default=None, help="load benchmark checkpoint from this file")
 
     args = parser.parse_args()
 
@@ -136,13 +146,40 @@ def main():
 
     report_episodes = 1
 
-    def episode_finished(r):
-        if r.episode % report_episodes == 0:
-            logger.info("Finished episode {ep} after {ts} timesteps".format(ep=r.episode, ts=r.timestep))
-            logger.info("Episode reward: {}".format(r.episode_rewards[-1]))
-            logger.info("Average of last 500 rewards: {}".format(sum(r.episode_rewards[-500:]) / 500))
-            logger.info("Average of last 100 rewards: {}".format(sum(r.episode_rewards[-100:]) / 100))
-        return True
+    def episode_finished_wrapper(experiment_num):
+        # TODO: remove wrapper as soon as it is possible to pass initial episode/timestep numbers to the runner
+        def episode_finished(r):
+            if r.episode % report_episodes == 0:
+                logger.info("Finished episode {ep} after {ts} timesteps".format(ep=r.episode, ts=r.timestep))
+                logger.info("Episode reward: {}".format(r.episode_rewards[-1]))
+                logger.info("Average of last 500 rewards: {}".format(sum(r.episode_rewards[-500:]) / 500))
+                logger.info("Average of last 100 rewards: {}".format(sum(r.episode_rewards[-100:]) / 100))
+
+            if args.checkpoint and args.checkpoint_episodes > 0:
+                if r.episode % args.checkpoint_episodes == 0:
+                    logger.info("Saving benchmark checkpoint to {}".format(args.checkpoint))
+                    save_data = dict(
+                        episode_rewards=copy(runner.episode_rewards),
+                        episode_lengths=copy(runner.episode_lengths),
+                        episode_end_times=copy(runner.episode_times)
+                    )
+
+                    if args.load_checkpoint and checkpoint_data and experiment_num == 0:
+                        logger.info("Prepending loaded benchmark checkpoint data...".format(args.checkpoint))
+                        save_data['episode_rewards'][:0] = checkpoint_data['episode_rewards']
+                        save_data['episode_lengths'][:0] = checkpoint_data['episode_lengths']
+                        save_data['episode_end_times'][:0] = checkpoint_data['episode_end_times']
+
+                    pickle.dump(save_data, open(args.checkpoint, 'wb'))
+
+            return True
+
+        return episode_finished
+
+    if args.load_checkpoint:
+        logger.info("Loading benchmark checkpoint data from {}".format(args.load_checkpoint))
+        with open(os.path.join(os.getcwd(), args.load_checkpoint), "rb") as f:
+            checkpoint_data = pickle.load(f)
 
     logger.info("Starting benchmark for agent {agent} and Environment '{env}'".format(agent=config.agent,
                                                                                       env=args.gym_id))
@@ -175,7 +212,7 @@ def main():
 
         logger.info("Starting experiment {}".format(i+1))
 
-        runner.run(config.episodes, config.max_timesteps, episode_finished=episode_finished)
+        runner.run(config.episodes, config.max_timesteps, episode_finished=episode_finished_wrapper(i))
 
         logger.info("Learning finished. Total episodes: {ep}".format(ep=runner.episode))
 
@@ -192,6 +229,11 @@ def main():
             ),
             config=original_config
         )
+
+        if i == 0 and args.load_checkpoint and checkpoint_data:
+            experiment_data['episode_rewards'][:0] = checkpoint_data['episode_rewards']
+            experiment_data['episode_lengths'][:0] = checkpoint_data['episode_lengths']
+            experiment_data['episode_end_times'][:0] = checkpoint_data['episode_end_times']
 
         benchmark_data.append(experiment_data)
 
