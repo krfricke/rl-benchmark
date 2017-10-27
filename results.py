@@ -178,7 +178,7 @@ def main():
         full_data = list()
         logger.info("Found {} experiments.".format(len(benchmark_data)))
         for experiment_data in benchmark_data:
-            lengths = np.array(experiment_data['episode_lengths'])  # episode lengths
+            lengths = np.array(experiment_data['episode_timesteps'])  # episode lengths
             timesteps = np.cumsum(lengths)  # cumulative episode lengths as timesteps
             rewards = np.array(experiment_data['episode_rewards'])  # turn rewards into numpy array
             seconds = np.cumsum(experiment_data['episode_end_times'])  # cumulative times in seconds
