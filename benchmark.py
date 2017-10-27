@@ -19,7 +19,7 @@ TensorForce benchmarking.
 Usage:
 
 ```bash
-python benchmark.py [--output output] [--append] <algorithm> <gym_id>
+python benchmark.py [--output output] [--experiments num_experiments] [--append] [--model <path>] [--save-model <num_episodes>] [--load-model <path>] [--history <file>] [--history-episodes <num_episodes>] [--load-history <file>] <algorithm> <gym_id>
 ```
 
 `algorithm` specifies which config file to use. You can pass the path to a valid json config file, or a string
@@ -39,6 +39,14 @@ model will not be saved.
 `load-model <path>` states from which path to load the model (only for the first experiment, if more than one
 experiment should run). If omitted, it does not load a model.
 
+`history <file>` states the file where the history of the run should be periodically saved. If omitted, history will
+not be saved.
+
+`history-episodes <num_episodes>` states after how many episodes the history should be saved. If 0 or omitted,
+history will not be saved.
+
+`load-history <file>` states from which path to load the the run history (only for the first experiment, if more than one
+experiment should run). If omitted, it does not load a history.
 
 The resulting output file is a pickled python list, where each item is a dict containing benchmark data.
 
@@ -72,7 +80,6 @@ from six.moves import xrange
 
 from tensorforce import Configuration
 from tensorforce.agents import agents
-from tensorforce.core.networks import layered_network_builder
 from tensorforce.execution import Runner
 from tensorforce.contrib.openai_gym import OpenAIGym
 
@@ -93,14 +100,10 @@ def main():
     parser.add_argument('-s', '--save-model', default=0, type=int, help="save model every n episodes")
     parser.add_argument('-l', '--load-model', default=None, help="load model from this file")
 
-    # TODO: this is not yet documented, as there are some problems with loading from checkpoints at the moment.
-    # For instance, loading from a checkpoint does not set the total_timestep etc in the runner, which can lead to
-    # problems with the exploration and length of a continued run. We need to change the runner class in base
-    # tensorforce to address these issues, which is on our to-do list.
-    parser.add_argument('-C', '--checkpoint', default=None, help="benchmark checkpoint file")
-    parser.add_argument('-E', '--checkpoint-episodes', default=0, type=int,
-                        help="save benchmark checkpoint every n episodes")
-    parser.add_argument('-L', '--load-checkpoint', default=None, help="load benchmark checkpoint from this file")
+    parser.add_argument('-H', '--history', default=None, help="benchmark history file")
+    parser.add_argument('-E', '--history-episodes', default=0, type=int,
+                        help="save benchmark history every n episodes")
+    parser.add_argument('-L', '--load-history', default=None, help="load benchmark history data from this file")
 
     args = parser.parse_args()
 
@@ -146,40 +149,34 @@ def main():
 
     report_episodes = 1
 
-    def episode_finished_wrapper(experiment_num):
-        # TODO: remove wrapper as soon as it is possible to pass initial episode/timestep numbers to the runner
-        def episode_finished(r):
-            if r.episode % report_episodes == 0:
-                logger.info("Finished episode {ep} after {ts} timesteps".format(ep=r.episode, ts=r.timestep))
-                logger.info("Episode reward: {}".format(r.episode_rewards[-1]))
-                logger.info("Average of last 500 rewards: {}".format(sum(r.episode_rewards[-500:]) / 500))
-                logger.info("Average of last 100 rewards: {}".format(sum(r.episode_rewards[-100:]) / 100))
+    def episode_finished(r):
+        if r.episode % report_episodes == 0:
+            logger.info("Finished episode {ep} after {ts} timesteps".format(ep=r.episode, ts=r.timestep))
+            logger.info("Episode reward: {}".format(r.episode_rewards[-1]))
+            logger.info("Average of last 500 rewards: {}".format(sum(r.episode_rewards[-500:]) / 500))
+            logger.info("Average of last 100 rewards: {}".format(sum(r.episode_rewards[-100:]) / 100))
 
-            if args.checkpoint and args.checkpoint_episodes > 0:
-                if r.episode % args.checkpoint_episodes == 0:
-                    logger.info("Saving benchmark checkpoint to {}".format(args.checkpoint))
-                    save_data = dict(
-                        episode_rewards=copy(runner.episode_rewards),
-                        episode_lengths=copy(runner.episode_lengths),
-                        episode_end_times=copy(runner.episode_times)
-                    )
+        if args.history and args.history_episodes > 0:
+            if r.episode % args.history_episodes == 0:
+                logger.info("Saving benchmark history to {}".format(args.history))
+                save_data = dict(
+                    episode=r.episode,
+                    timestep=r.timestep,
+                    episode_rewards=copy(runner.episode_rewards),
+                    episode_timesteps=copy(runner.episode_timesteps),
+                    episode_end_times=copy(runner.episode_times)
+                )
 
-                    if args.load_checkpoint and checkpoint_data and experiment_num == 0:
-                        logger.info("Prepending loaded benchmark checkpoint data...".format(args.checkpoint))
-                        save_data['episode_rewards'][:0] = checkpoint_data['episode_rewards']
-                        save_data['episode_lengths'][:0] = checkpoint_data['episode_lengths']
-                        save_data['episode_end_times'][:0] = checkpoint_data['episode_end_times']
+                pickle.dump(save_data, open(args.history, 'wb'))
 
-                    pickle.dump(save_data, open(args.checkpoint, 'wb'))
+        return True
 
-            return True
-
-        return episode_finished
-
-    if args.load_checkpoint:
-        logger.info("Loading benchmark checkpoint data from {}".format(args.load_checkpoint))
-        with open(os.path.join(os.getcwd(), args.load_checkpoint), "rb") as f:
-            checkpoint_data = pickle.load(f)
+    if args.load_history:
+        logger.info("Loading benchmark history data from {}".format(args.load_history))
+        with open(os.path.join(os.getcwd(), args.load_history), "rb") as f:
+            history_data = pickle.load(f)
+    else:
+        history_data=None
 
     logger.info("Starting benchmark for agent {agent} and Environment '{env}'".format(agent=config.agent,
                                                                                       env=args.gym_id))
@@ -188,12 +185,12 @@ def main():
     for i in xrange(args.experiments):
         config = original_config.copy()
 
-        config.network = layered_network_builder(config.network)
         environment = OpenAIGym(args.gym_id)
 
-        config.default(dict(states=environment.states, actions=environment.actions))
-
-        agent = agents[config.agent](config=config)
+        agent = agents[config.agent](states_spec=environment.states,
+                                     actions_spec=environment.actions,
+                                     network_spec=config.network,
+                                     config=config)
 
         if i == 0 and args.load_model:
             logger.info("Loading model data from file: {}".format(args.load_model))
@@ -203,8 +200,9 @@ def main():
             agent=agent,
             environment=environment,
             repeat_actions=1,
-            save_path=args.model,
-            save_episodes=args.save_model
+            history=history_data
+            # save_path=args.model,
+            # save_episodes=args.save_model
         )
 
         environment.reset()
@@ -212,13 +210,13 @@ def main():
 
         logger.info("Starting experiment {}".format(i+1))
 
-        runner.run(config.episodes, config.max_timesteps, episode_finished=episode_finished_wrapper(i))
+        runner.run(config.episodes, config.max_timesteps, episode_finished=episode_finished)
 
         logger.info("Learning finished. Total episodes: {ep}".format(ep=runner.episode))
 
         experiment_data = dict(
             episode_rewards=runner.episode_rewards,
-            episode_lengths=runner.episode_lengths,
+            episode_lengths=runner.episode_timesteps,
             initial_reset_time=0,
             episode_end_times=runner.episode_times,
             info=dict(
@@ -229,11 +227,6 @@ def main():
             ),
             config=original_config
         )
-
-        if i == 0 and args.load_checkpoint and checkpoint_data:
-            experiment_data['episode_rewards'][:0] = checkpoint_data['episode_rewards']
-            experiment_data['episode_lengths'][:0] = checkpoint_data['episode_lengths']
-            experiment_data['episode_end_times'][:0] = checkpoint_data['episode_end_times']
 
         benchmark_data.append(experiment_data)
 

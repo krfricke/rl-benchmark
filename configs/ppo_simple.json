@@ -1,40 +1,47 @@
 {
-  "agent": "PPOAgent",
-  "episodes": 100,
-  "max_timesteps": 200,
+    "agent": "ppo_agent",
+    "episodes": 5000,
+    "max_timesteps": 200,
 
-  "log_level": "info",
+    "log_level": "info",
 
-  "batch_size": 4000,
-  "discount": 0.99,
-  "gae_rewards": false,
-  "gae_lambda": 0.97,
-  "normalize_advantage" : false,
-  "learning_rate" : 0.001,
-  "entropy_penalty" :  0.01,
-  "epochs" : 5,
-  "optimizer_batch_size" : 512,
-  "loss_clipping" : 0.2,
-  
-  "baseline": {
-    "type": "mlp",
-    "sizes": [32, 32],
-    "epochs": 1,
-    "update_batch_size" : 512,
-    "learning_rate": 0.01
-  },
-
-  "network": [
-    {
-      "type": "dense",
-      "size": 32,
-      "activation": "tanh"
+    "batch_size": 4000,
+    "step_optimizer": {
+        "type": "adam",
+        "learning_rate": 1e-2
     },
-    {
-      "type": "dense",
-      "size": 32,
-      "activation": "tanh"
-    }
-  ]
+    "optimization_steps": 5,
 
+    "discount": 0.99,
+    "normalize_rewards": false,
+    "entropy_regularization": 1e-2,
+    "gae_lambda": null,
+    "likelihood_ratio_clipping": 0.2,
+
+    "baseline_mode": "states",
+    "baseline": {
+      "type": "mlp",
+      "sizes": [32, 32]
+    },
+    "baseline_optimizer": {
+        "type": "multi_step",
+        "optimizer": {
+            "type": "adam",
+            "learning_rate": 2e-4
+        },
+        "num_steps": 5
+    },
+     
+    "network": [
+        {
+            "type": "dense",
+            "size": 32,
+            "activation": "tanh"
+        },
+        {
+            "type": "dense",
+            "size": 32,
+            "activation": "tanh"
+        }
+    ]
 }

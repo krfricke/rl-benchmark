@@ -11,7 +11,7 @@ Creating benchmarks
 You can easily create benchmarks using pre-supplied config files or your own configurations.
 
 ```bash
-python benchmark.py [--output output] [--experiments num_experiments] [--append] [--model <path>] [--save-model <num_episodes>] [--load-model <path>] <algorithm> <gym_id>
+python benchmark.py [--output output] [--experiments num_experiments] [--append] [--model <path>] [--save-model <num_episodes>] [--load-model <path>] [--history <file>] [--history-episodes <num_episodes>] [--load-history <file>] <algorithm> <gym_id>
 ```
 
 `algorithm` specifies which config file to use. You can pass the path to a valid json config file, or a string
@@ -30,6 +30,15 @@ indicating which prepared config to use (e.g. `dqn2015`).
 `save-model <num_episodes>` states after how many episodes the model should be saved. If 0, model will not be saved.
 
 `load-model <path>` states from which path to load the model (only for the first experiment, if more than one experiment should run). If omitted, it does not load a model.
+
+`history <file>` states the file where the history of the run should be periodically saved. If omitted, history will
+not be saved.
+
+`history-episodes <num_episodes>` states after how many episodes the history should be saved. If 0 or omitted,
+history will not be saved.
+
+`load-history <file>` states from which path to load the the run history (only for the first experiment, if more than one
+experiment should run). If omitted, it does not load a history.
 
 Analyzing benchmarks
 --------------------
