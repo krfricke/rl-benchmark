@@ -53,7 +53,7 @@ The resulting output file is a pickled python list, where each item is a dict co
 The dict has the following keys:
 
 * `episode_rewards`: list containing observed total rewards for each episode.
-* `episode_lengths`: list containing total timesteps for each episode.
+* `episode_timesteps`: list containing total timesteps for each episode.
 * `initial_reset_time`: integer indicating starting timestamp (usually 0).
 * `episode_end_times`: list containing observed end times relativ to `initial_reset_time` (not working at the moment).
 * `info`: dict containing meta information about the experiment:
@@ -70,6 +70,7 @@ from __future__ import division
 from __future__ import print_function
 
 import argparse
+import time
 import logging
 import os
 import pickle
@@ -78,7 +79,9 @@ from copy import copy
 
 from six.moves import xrange
 
-from tensorforce import Configuration
+from tensorflow import __version__ as tensorflow_version
+
+from tensorforce import Configuration, __version__ as tensorforce_version
 from tensorforce.agents import agents
 from tensorforce.execution import Runner
 from tensorforce.contrib.openai_gym import OpenAIGym
@@ -210,20 +213,28 @@ def main():
 
         logger.info("Starting experiment {}".format(i+1))
 
+        experiment_start_time = int(time.time())
         runner.run(config.episodes, config.max_timesteps, episode_finished=episode_finished)
+        experiment_end_time = int(time.time())
 
         logger.info("Learning finished. Total episodes: {ep}".format(ep=runner.episode))
 
         experiment_data = dict(
-            episode_rewards=runner.episode_rewards,
-            episode_lengths=runner.episode_timesteps,
             initial_reset_time=0,
+            episode_rewards=runner.episode_rewards,
+            episode_timesteps=runner.episode_timesteps,
             episode_end_times=runner.episode_times,
-            info=dict(
+
+            metadata=dict(
                 agent=config.agent,
                 episodes=config.episodes,
                 max_timesteps=config.max_timesteps,
-                environment_name=args.gym_id
+                environment_domain='openai_gym',
+                environment_name=args.gym_id,
+                tensorforce_version=tensorforce_version,
+                tensorflow_version=tensorflow_version,
+                start_time=experiment_start_time,
+                end_time=experiment_end_time
             ),
             config=original_config
         )
