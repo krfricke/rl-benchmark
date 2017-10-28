@@ -25,7 +25,7 @@ python results.py [--output output] [--input <file> <name>] [--input <file> <nam
 `input` expects two parameters. `file` points to a pickle file (pkl) containing experiment data (e.g. created by
 running `benchmark.py`). `name` is a string containing the label for the plot. You can state multiple input files.
 
-`output` is an optional parameter to set the output (png) file. If omitted, output will be saved as `./output.png`.
+`output` is an optional parameter to set the output image file. If omitted, output will be saved as `./output.png`.
 
 The resulting output file is a PNG image containing plots for rewards by episodes and rewards by timesteps.
 """
@@ -140,6 +140,14 @@ def main():
                         help="Input file(s): <file> <name>")
     parser.add_argument('-o', '--output', default="output.png", help="output file (image png)")
 
+    parser.add_argument('-E', '--show-episodes', action='store_true', default=False,
+                        help="show rewards by episode number")
+    parser.add_argument('-T', '--show-timesteps', action='store_true', default=False,
+                        help="show rewards by global timestep")
+    parser.add_argument('-S', '--show-seconds', action='store_true', default=False,
+                        help="show rewards by (wallclock) seconds")
+
+
     args = parser.parse_args()
 
     if len(args.input) < 1:
@@ -157,10 +165,32 @@ def main():
 
     # plot_cols = min(len(data.keys()) * 2, 4)
     # plot_rows = (len(data.keys()) * 2 + plot_cols - 1) // plot_cols
-    plot_cols = 3
-    plot_rows = 1
+    num_plots = 0
+    if args.show_episodes:
+        num_plots += 1
+
+    if args.show_timesteps:
+        num_plots += 1
+
+    if args.show_seconds:
+        num_plots += 1
+
+    if num_plots <= 0:
+        logger.error("Please specify at least one plot type (-E, -T, or -S)")
+        return
+
+    max_row_length = 4
+    if num_plots <= max_row_length:
+        plot_rows = 1
+        plot_cols = num_plots
+    else:
+        plot_rows = num_plots // max_row_length + 1
+        plot_cols = max_row_length
 
     figure, axes = plt.subplots(ncols=plot_cols, nrows=plot_rows, figsize=(plot_cols * 6, plot_rows * 6))
+
+    if num_plots == 1:
+        axes = [axes]
 
     # figure = plt.figure()
 
@@ -194,46 +224,49 @@ def main():
         ax_index = -1
 
         # Plot average rewards by episodes
-        re_plot = to_timeseries(full_data, x_label="Episode", y_label="Average Episode Reward",
-                                target=rewards_by_episodes, cut_x=least_episodes, smooth=10)
+        if args.show_episodes:
+            re_plot = to_timeseries(full_data, x_label="Episode", y_label="Average Episode Reward",
+                                    target=rewards_by_episodes, cut_x=least_episodes, smooth=10)
 
-        ax_index += 1
-        ax = axes[ax_index]
+            ax_index += 1
+            ax = axes[ax_index]
 
-        plot = sns.tsplot(data=re_plot, time="Episode", value="Average Episode Reward", unit="experiment",
-                          ax=ax, ci=[68, 95], color=color)
+            plot = sns.tsplot(data=re_plot, time="Episode", value="Average Episode Reward", unit="experiment",
+                              ax=ax, ci=[68, 95], color=color)
 
-        ax_legends[ax_index].append(patch)
+            ax_legends[ax_index].append(patch)
 
-        figure.add_subplot(plot)
+            figure.add_subplot(plot)
 
         # Plot average rewards by timesteps
-        rt_plot = to_timeseries(full_data, x_label="Timestep", y_label="Average Episode Reward",
-                                target=rewards_by_timesteps, cut_x=least_timesteps, smooth=10)
+        if args.show_timesteps:
+            rt_plot = to_timeseries(full_data, x_label="Timestep", y_label="Average Episode Reward",
+                                    target=rewards_by_timesteps, cut_x=least_timesteps, smooth=10)
 
-        ax_index += 1
-        ax = axes[ax_index]
+            ax_index += 1
+            ax = axes[ax_index]
 
-        plot = sns.tsplot(data=rt_plot, time="Timestep", value="Average Episode Reward", unit="experiment",
-                          ax=ax, ci=[68, 95], color=color)
+            plot = sns.tsplot(data=rt_plot, time="Timestep", value="Average Episode Reward", unit="experiment",
+                              ax=ax, ci=[68, 95], color=color)
 
-        ax_legends[ax_index].append(patch)
+            ax_legends[ax_index].append(patch)
 
-        figure.add_subplot(plot)
+            figure.add_subplot(plot)
 
         # Plot average rewards by seconds
-        rs_plot = to_timeseries(full_data, x_label="Seconds", y_label="Average Episode Reward",
-                                target=rewards_by_seconds, cut_x=least_seconds, smooth=10)
+        if args.show_seconds:
+            rs_plot = to_timeseries(full_data, x_label="Seconds", y_label="Average Episode Reward",
+                                    target=rewards_by_seconds, cut_x=least_seconds, smooth=10)
 
-        ax_index += 1
-        ax = axes[ax_index]
+            ax_index += 1
+            ax = axes[ax_index]
 
-        plot = sns.tsplot(data=rs_plot, time="Seconds", value="Average Episode Reward", unit="experiment",
-                          ax=ax, ci=[68, 95], color=color)
+            plot = sns.tsplot(data=rs_plot, time="Seconds", value="Average Episode Reward", unit="experiment",
+                              ax=ax, ci=[68, 95], color=color)
 
-        ax_legends[ax_index].append(patch)
+            ax_legends[ax_index].append(patch)
 
-        figure.add_subplot(plot)
+            figure.add_subplot(plot)
 
     for ax_index, ax in enumerate(axes):
         ax.legend(handles=ax_legends[ax_index], loc=4)
