@@ -154,7 +154,7 @@ def main():
 
     def episode_finished(r):
         if r.episode % report_episodes == 0:
-            logger.info("Finished episode {ep} after {ts} timesteps".format(ep=r.episode, ts=r.timestep))
+            logger.info("Finished episode {ep} after {ts} timesteps".format(ep=r.episode, ts=r.episode_timestep))
             logger.info("Episode reward: {}".format(r.episode_rewards[-1]))
             logger.info("Average of last 500 rewards: {}".format(sum(r.episode_rewards[-500:]) / 500))
             logger.info("Average of last 100 rewards: {}".format(sum(r.episode_rewards[-100:]) / 100))
@@ -164,7 +164,7 @@ def main():
                 logger.info("Saving benchmark history to {}".format(args.history))
                 save_data = dict(
                     episode=r.episode,
-                    timestep=r.timestep,
+                    timestep=r.episode_timestep,
                     episode_rewards=copy(runner.episode_rewards),
                     episode_timesteps=copy(runner.episode_timesteps),
                     episode_end_times=copy(runner.episode_times)
@@ -214,7 +214,7 @@ def main():
         logger.info("Starting experiment {}".format(i+1))
 
         experiment_start_time = int(time.time())
-        runner.run(config.episodes, config.max_timesteps, episode_finished=episode_finished)
+        runner.run(episodes=config.episodes, max_episode_timesteps=config.max_timesteps, episode_finished=episode_finished)
         experiment_end_time = int(time.time())
 
         logger.info("Learning finished. Total episodes: {ep}".format(ep=runner.episode))
@@ -240,8 +240,6 @@ def main():
         )
 
         benchmark_data.append(experiment_data)
-
-        environment.close()
 
     logger.info("Saving benchmark to {}".format(benchmark_file))
     pickle.dump(benchmark_data, open(benchmark_file, 'wb'))
