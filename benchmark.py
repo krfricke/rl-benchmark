@@ -236,7 +236,7 @@ def main():
                 start_time=experiment_start_time,
                 end_time=experiment_end_time
             ),
-            config=original_config
+            config=dict(original_config.items())  # convert Configuration object into dict
         )
 
         benchmark_data.append(experiment_data)

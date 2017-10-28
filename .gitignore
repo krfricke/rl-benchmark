@@ -14,3 +14,4 @@ tf_worker_*.txt
 *.pkl
 *.png
 benchmarks/
+.config

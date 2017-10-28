@@ -1,6 +1,8 @@
 Pillow
 scipy
 numpy
+requests
+arghandler
 tensorflow>=1.2.1
 gym[all]
 git+https://github.com/reinforceio/tensorforce.git
