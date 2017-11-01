@@ -24,6 +24,7 @@ import os
 import pickle
 
 from copy import copy
+from six.moves import xrange
 from tensorflow import __version__ as tensorflow_version
 
 from tensorforce.agents import agents
