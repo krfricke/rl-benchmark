@@ -11,7 +11,7 @@ Creating benchmarks
 You can easily create benchmarks using pre-supplied config files or your own configurations.
 
 ```bash
-python benchmark.py [--output output] [--experiments num_experiments] [--append] [--model <path>] [--save-model <num_episodes>] [--load-model <path>] [--history <file>] [--history-episodes <num_episodes>] [--load-history <file>] <algorithm> <gym_id>
+python scripts/openai_benchmark.py [--output output] [--experiments num_experiments] [--append] [--model <path>] [--save-model <num_episodes>] [--load-model <path>] [--history <file>] [--history-episodes <num_episodes>] [--load-history <file>] <algorithm> <gym_id>
 ```
 
 `algorithm` specifies which config file to use. You can pass the path to a valid json config file, or a string
@@ -21,15 +21,17 @@ indicating which prepared config to use (e.g. `dqn2015`).
 
 `output` is an optional parameter to set the output (pickle) file. If omitted, output will be saved in `./benchmarks`.
 
-`experiments` indicates how often the experiment should be run.
-
 `append` is an optional parameter which indicates if data should be appended to an existing output file.
+
+`force` is an optional parameter which indicates if an existing output file should be overwritten.
 
 `model` is an optional path for the `tf.train.Saver` class. If empty, model will not be saved.
 
-`save-model <num_episodes>` states after how many episodes the model should be saved. If 0, model will not be saved.
+`save-model <num_episodes>` states after how many episodes the model should be saved. If 0 or omitted,
+model will not be saved.
 
-`load-model <path>` states from which path to load the model (only for the first experiment, if more than one experiment should run). If omitted, it does not load a model.
+`load-model <path>` states from which path to load the model (only for the first experiment, if more than one
+experiment should run). If omitted, it does not load a model.
 
 `history <file>` states the file where the history of the run should be periodically saved. If omitted, history will
 not be saved.
@@ -40,21 +42,24 @@ history will not be saved.
 `load-history <file>` states from which path to load the the run history (only for the first experiment, if more than one
 experiment should run). If omitted, it does not load a history.
 
+
 Analyzing benchmarks
 --------------------
 
 At the moment, we provide plotting of the results obtained from our benchmarking script.
 
 ```bash
-python results.py [--output output] [--input <file> <name>] [--input <file> <name> ...]
+python plot_results.py [--output output] [--show-episodes] [--show-timesteps] [--show-seconds] [--input <file> <name>] [--input <file> <name> ...]
 ```
 
 `input` expects two parameters. `file` points to a pickle file (pkl) containing experiment data (e.g. created by
-running `benchmark.py`). `name` is a string containing the label for the plot.
+running `benchmark.py`). `name` is a string containing the label for the plot. You can state multiple input files.
 
-`output` is an optional parameter to set the output (png) file. If omitted, output will be saved as `./output.png`.
+`output` is an optional parameter to set the output image file. If omitted, output will be saved as `./output.png`.
 
-The resulting output file is a PNG image containing plots for rewards by episodes and rewards by timesteps.
+`--show-*` indicates which values are to be used for the x axes.
+
+The resulting output file is an image containing plots for rewards by episodes and rewards by timesteps.
 
 This is a sample output for `CartPole-v0`, comparing VPG, TRPO and PPO (using the configurations provided in `configs`):
 

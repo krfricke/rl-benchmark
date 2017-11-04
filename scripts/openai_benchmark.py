@@ -13,6 +13,61 @@
 # limitations under the License.
 # ==============================================================================
 
+"""
+TensorForce benchmarking.
+
+Usage:
+
+```bash
+python openai_benchmark.py [--output output] [--experiments num_experiments] [--append] [--model <path>] [--save-model <num_episodes>] [--load-model <path>] [--history <file>] [--history-episodes <num_episodes>] [--load-history <file>] <algorithm> <gym_id>
+```
+
+`algorithm` specifies which config file to use. You can pass the path to a valid json config file, or a string
+indicating which prepared config to use (e.g. `dqn2015`).
+
+`gym_id` should be a valid [OpenAI gym ID](https://gym.openai.com/envs)
+
+`output` is an optional parameter to set the output (pickle) file. If omitted, output will be saved in `./benchmarks`.
+
+`append` is an optional parameter which indicates if data should be appended to an existing output file.
+
+`force` is an optional parameter which indicates if an existing output file should be overwritten.
+
+`model` is an optional path for the `tf.train.Saver` class. If empty, model will not be saved.
+
+`save-model <num_episodes>` states after how many episodes the model should be saved. If 0 or omitted,
+model will not be saved.
+
+`load-model <path>` states from which path to load the model (only for the first experiment, if more than one
+experiment should run). If omitted, it does not load a model.
+
+`history <file>` states the file where the history of the run should be periodically saved. If omitted, history will
+not be saved.
+
+`history-episodes <num_episodes>` states after how many episodes the history should be saved. If 0 or omitted,
+history will not be saved.
+
+`load-history <file>` states from which path to load the the run history (only for the first experiment, if more than one
+experiment should run). If omitted, it does not load a history.
+
+The resulting output file is a pickled python list, where each item is a dict containing benchmark data.
+
+The dict has the following keys:
+
+* `episode_rewards`: list containing observed total rewards for each episode.
+* `episode_timesteps`: list containing total timesteps for each episode.
+* `initial_reset_time`: integer indicating starting timestamp (usually 0).
+* `episode_end_times`: list containing observed end times relativ to `initial_reset_time` (not working at the moment).
+* `info`: dict containing meta information about the experiment:
+    * `agent`: TensorForce agent used in the experiment.
+    * `episodes`: Episode count configuration item.
+    * `max_timesteps`: Max timesteps configuration item.
+    * `environment_name`: Environment name configuration item.
+* `config`: `Configuration` object containing the original configuration passed to the benchmarking script.
+
+"""
+
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
