@@ -38,14 +38,9 @@ from __future__ import print_function
 
 import argparse
 import logging
-import os
-import pickle
-
-import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import seaborn as sns
+import os
+import sys
 
 from tensorforce_benchmark.analyze.plotter import ResultPlotter
 from tensorforce_benchmark.data import BenchmarkData
@@ -136,6 +131,8 @@ def main():
     logger.info("Saving figure to {}".format(args.output))
     figure.savefig(args.output)
 
+    return 0
+
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

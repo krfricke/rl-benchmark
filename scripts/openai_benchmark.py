@@ -75,6 +75,7 @@ from __future__ import print_function
 import argparse
 import logging
 import os
+import sys
 
 from tensorforce_benchmark.benchmark.runner import BenchmarkRunner
 from tensorforce.contrib.openai_gym import OpenAIGym
@@ -155,4 +156,4 @@ def main():
     return 0
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
