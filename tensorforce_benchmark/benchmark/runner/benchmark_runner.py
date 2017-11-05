@@ -23,8 +23,11 @@ import numpy as np
 import os
 import pickle
 
+from collections import OrderedDict
 from copy import copy
 from six.moves import xrange
+from tqdm import tqdm
+
 from tensorflow import __version__ as tensorflow_version
 
 from tensorforce.agents import agents
@@ -55,6 +58,8 @@ class BenchmarkRunner(object):
         self.environment_callback = None
         self.environment_domain = 'user'
         self.environment_name = None
+
+        self.progress_bar = None
 
     def load_config(self, filename):
         """
@@ -151,11 +156,19 @@ class BenchmarkRunner(object):
         Returns: Boolean indicating whether to continue run or not.
 
         """
-        if runner.episode % self.report_episodes == 0:
-            logging.info("Finished episode {ep} after {ts} timesteps".format(ep=runner.episode, ts=runner.episode_timestep))
-            logging.info("Episode reward: {}".format(runner.episode_rewards[-1]))
-            logging.info("Average of last 500 rewards: {:.2f}".format(np.mean(runner.episode_rewards[-500:])))
-            logging.info("Average of last 100 rewards: {:.2f}".format(np.mean(runner.episode_rewards[-100:])))
+        if self.progress_bar:
+            self.progress_bar.update(1)
+            self.progress_bar.set_postfix(OrderedDict([
+                ('R', '{:8.0f}'.format(runner.episode_rewards[-1])),
+                ('AR100', '{:8.2f}'.format(np.mean(runner.episode_rewards[-100:]))),
+                ('AR500', '{:8.2f}'.format(np.mean(runner.episode_rewards[-500:])))
+            ]))
+        else:
+            if runner.episode % self.report_episodes == 0:
+                logging.info("Finished episode {ep} after {ts} timesteps".format(ep=runner.episode, ts=runner.episode_timestep))
+                logging.info("Episode reward: {}".format(runner.episode_rewards[-1]))
+                logging.info("Average of last 500 rewards: {:.2f}".format(np.mean(runner.episode_rewards[-500:])))
+                logging.info("Average of last 100 rewards: {:.2f}".format(np.mean(runner.episode_rewards[-100:])))
 
         if self.save_history_file and self.save_history_episodes > 0:
             if runner.episode % self.save_history_episodes == 0:
@@ -225,12 +238,13 @@ class BenchmarkRunner(object):
             environment.reset()
             agent.reset()
 
-            logging.info("Starting experiment {}".format(i + 1))
+            logging.info("Starting experiment {:d}".format(i + 1))
 
-            experiment_start_time = int(time.time())
-            runner.run(episodes=config.episodes, max_episode_timesteps=config.max_timesteps,
-                       episode_finished=self.episode_finished)
-            experiment_end_time = int(time.time())
+            with tqdm(total=config.episodes, desc='Experiment {:d}'.format(i + 1)) as self.progress_bar:
+                experiment_start_time = int(time.time())
+                runner.run(episodes=config.episodes, max_episode_timesteps=config.max_timesteps,
+                           episode_finished=self.episode_finished)
+                experiment_end_time = int(time.time())
 
             logging.info("Learning finished. Total episodes: {ep}".format(ep=runner.episode))
 

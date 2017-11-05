@@ -29,8 +29,8 @@ install_requires=[
     'pytest',
     'requests',
     'arghandler',
-    'tqdm',
-    'tensorforce'
+    'tqdm>=4.11.0',
+    'tensorforce>=0.3.0'
 ]
 
 setup_requires=[
