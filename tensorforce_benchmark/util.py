@@ -20,12 +20,37 @@ from __future__ import print_function
 import numpy as np
 import hashlib
 import json
+import logging
+import os
 
+from tensorforce.config import Configuration
 
 def hash_object(obj):
     json_str = json.dumps(obj, sort_keys=True)
     hash_str = hashlib.sha1(json_str.encode('utf8')).hexdigest()
     return str(hash_str)
+
+
+def load_config_file(filename, config_folder=None):
+    possible_config_file_paths = [
+        os.path.join(os.getcwd(), filename)  # first check absolute path
+    ]
+
+    if config_folder:
+        possible_config_file_paths += [
+            os.path.join(config_folder, '{}'.format(filename)),  # check with user-supplied file suffix
+            os.path.join(config_folder, '{}.json'.format(filename))  # check with json suffix
+        ]
+
+    for possible_config_file_path in possible_config_file_paths:
+        if not os.path.exists(possible_config_file_path):
+            logging.debug("Possible config file does not exist: {}".format(possible_config_file_path))
+            continue
+
+        logging.debug("Found config file at {}".format(possible_config_file_path))
+        return Configuration.from_json(possible_config_file_path)
+
+    return None
 
 
 def n_step_average(data, n):

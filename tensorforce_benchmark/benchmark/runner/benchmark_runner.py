@@ -34,6 +34,8 @@ from tensorforce.agents import agents
 from tensorforce import Configuration, __version__ as tensorforce_version
 from tensorforce.execution import Runner
 
+from tensorforce_benchmark.util import load_config_file
+
 
 class BenchmarkRunner(object):
     def __init__(self, config=None, config_folder=None, output_folder='/tmp'):
@@ -71,31 +73,16 @@ class BenchmarkRunner(object):
         Returns: Boolean
 
         """
+        config = load_config_file(filename, config_folder=self.config_folder)
 
-        possible_config_file_paths = [
-            os.path.join(os.getcwd(), filename)  # first check absolute path
-        ]
+        if not config:
+            return False
 
-        if self.config_folder:
-            possible_config_file_paths += [
-                os.path.join(self.config_folder, '{}'.format(filename)),  # check with user-supplied file suffix
-                os.path.join(self.config_folder, '{}.json'.format(filename))  # check with json suffix
-            ]
+        if self.config:
+            logging.warning("Overwriting existing configuration")
 
-        for possible_config_file_path in possible_config_file_paths:
-            if not os.path.exists(possible_config_file_path):
-                logging.debug("Possible config file does not exist: {}".format(possible_config_file_path))
-                continue
-
-            logging.debug("Found config file at {}".format(possible_config_file_path))
-
-            if self.config:
-                logging.warning("Overriding existing configuration")
-
-            self.config = Configuration.from_json(possible_config_file_path)
-            return True
-
-        return False
+        self.config = config
+        return True
 
     def set_environment(self, environment_class, *args, **kwargs):
         """
