@@ -65,15 +65,18 @@ class BenchmarkRunner(object):
     def load_config(self, filename):
         """
         Load config from file. Either state a file from the config_folder (with or without file suffix),
-        or supply full file path.
+        or supply full file path, or pass `tensorforce.config.Configuration` object.
 
         Args:
-            filename: Filename or full file path
+            filename: Filename, or full file path, or `tensorforce.config.Configuration` object
 
         Returns: Boolean
 
         """
-        config = load_config_file(filename, config_folder=self.config_folder)
+        if isinstance(filename, Configuration):
+            config = filename
+        else:
+            config = load_config_file(filename, config_folder=self.config_folder)
 
         if not config:
             return False
