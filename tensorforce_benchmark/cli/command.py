@@ -21,10 +21,10 @@ import argparse
 
 
 class Command(object):
-    def __init__(self, db, name=None, config_file=None):
+    def __init__(self, db, name=None, context=None):
         self.db = db
         if not name:
             name = self.__class__.__name__
         self.name = name
-        self.config_file = config_file
+        self.context = context
         self.parser = argparse.ArgumentParser(prog=name)

@@ -29,7 +29,7 @@ from tensorforce_benchmark.cli import Command
 
 DEFAULT_CONFIG = {
     'db': 'local',
-    'localdb_path': '~/.cache/reinforce.io/localdb',
+    'localdb_path': '~/.rf_localdb/benchmarks.db',
     'webdb_url': 'https://benchmarks.reinforce.io',
     'auth_method': 'anonymous',
     'auth_credentials': None
@@ -38,12 +38,12 @@ DEFAULT_CONFIG = {
 
 class CreateConfigCommand(Command):
     def run(self, args):
-        print("This will create a config file at {path}".format(path=self.config_file))
+        print("This will create a config file at {path}".format(path=self.context['config_file']))
         if not ask_yesno("Continue?", default='no'):
             return 1
 
         logging.info("Checking for existing config file...")
-        config_file = os.path.join(os.getcwd(), self.config_file)
+        config_file = os.path.join(os.getcwd(), self.context['config_file'])
         config = load_config(config_file, default_config=DEFAULT_CONFIG, silent=True)
 
         webdb_url = ask_string("Please state the benchmark db URI [{}]:".format(config['webdb_url']),

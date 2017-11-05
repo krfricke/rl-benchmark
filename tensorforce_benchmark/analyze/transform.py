@@ -20,7 +20,7 @@ from __future__ import print_function
 import numpy as np
 import pandas as pd
 
-from tensorforce_benchmark.analyze.util import n_step_average
+from tensorforce_benchmark.util import n_step_average
 
 
 def rewards_by_episode(rewards, cut_x=1e12, *args, **kwargs):

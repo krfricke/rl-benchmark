@@ -17,12 +17,23 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import json
 import os
 import pickle
+
+from tensorforce_benchmark.data import BenchmarkData
+
 
 class BenchmarkDatabase(object):
     def __init__(self):
         pass
+
+    def load_config(self, config):
+        raise NotImplementedError
+
+    def load_config_file(self, config_file):
+        with open(config_file, 'r') as fp:
+            return self.load_config(json.load(fp))
 
     def get_benchmark(self, benchmark_hash):
         """
@@ -74,7 +85,7 @@ class BenchmarkDatabase(object):
             raise OSError("No such file: {}".format(benchmark_file))
 
         with open(benchmark_file, 'rb') as fp:
-            benchmark_data = pickle.load(fp)
+            benchmark_data = BenchmarkData.from_file(fp)
 
         return self.save_benchmark(benchmark_data)
 

@@ -235,11 +235,12 @@ class BenchmarkRunner(object):
             logging.info("Learning finished. Total episodes: {ep}".format(ep=runner.episode))
 
             experiment_data = dict(
-                initial_reset_time=0,
-                episode_rewards=runner.episode_rewards,
-                episode_timesteps=runner.episode_timesteps,
-                episode_end_times=runner.episode_times,
-
+                results=dict(
+                    initial_reset_time=0,
+                    episode_rewards=runner.episode_rewards,
+                    episode_timesteps=runner.episode_timesteps,
+                    episode_end_times=runner.episode_times
+                ),
                 metadata=dict(
                     agent=config.agent,
                     episodes=config.episodes,

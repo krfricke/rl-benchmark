@@ -33,7 +33,9 @@ class WebDatabase(BenchmarkDatabase):
                  webdb_url='https://benchmarks.reinforce.io',
                  webdb_cache='~/.cache/reinforce.io/webdb/',
                  auth_method='anonymous',
-                 auth_credentials=None
+                 auth_credentials=None,
+                 *args,
+                 **kwargs
                  ):
 
         super(WebDatabase, self).__init__()
@@ -43,12 +45,8 @@ class WebDatabase(BenchmarkDatabase):
         self.auth_method = auth_method
         self.auth_credentials = auth_credentials
 
-    def load_config_file(self, config_file):
-        with open(config_file, 'r') as fp:
-            return self.load_config(json.load(fp))
-
     def load_config(self, config):
-        self.url = config.pop('url', self.url)
+        self.url = config.pop('wedb_url', self.url)
 
         cache = config.pop('cache', None)
         if cache:

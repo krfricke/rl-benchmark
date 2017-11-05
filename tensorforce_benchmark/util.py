@@ -18,6 +18,14 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+import hashlib
+import json
+
+
+def hash_object(obj):
+    json_str = json.dumps(obj, sort_keys=True)
+    hash_str = hashlib.sha1(json_str.encode('utf8')).hexdigest()
+    return str(hash_str)
 
 
 def n_step_average(data, n):

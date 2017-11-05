@@ -64,10 +64,13 @@ def main():
 
     logging.info("Using {} database".format(db_type))
 
+    local_db = LocalDatabase(**config)
+    web_db = WebDatabase(**config)
+
     if db_type == 'local':
-        db = LocalDatabase(**config)
+        db = local_db
     elif db_type == 'web':
-        db = WebDatabase(**config)
+        db = web_db
     else:
         logging.error("No such database type: {}".format(db_type))
         return 1
@@ -77,7 +80,13 @@ def main():
         logging.error("No such db command: {}".format(args.command))
         return 2
 
-    db_cmd = db_cmd_obj(db, name=args.command, config_file=args.config_file)
+    context=dict(
+        config_file=args.config_file,
+        local_db=local_db,
+        web_db=web_db
+    )
+
+    db_cmd = db_cmd_obj(db, name=args.command, context=context)
 
     return db_cmd.run(args.args)
 

@@ -25,6 +25,9 @@ from tensorforce_benchmark.cli import Command
 
 
 class InfoCommand(Command):
+    """
+    Print info on benchmark.
+    """
     def run(self, args):
         self.parser.add_argument('benchmark_hash', help="Benchmark hash to get info for")
         self.parser.add_argument('-f', '--force', action='store_true', default=False,
