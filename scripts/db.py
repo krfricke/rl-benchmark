@@ -34,8 +34,10 @@ from tensorforce_benchmark.cli.util import load_config
 from tensorforce_benchmark.cli.db import commands as db_commands
 
 logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
-DEFAULT_CONFIG_FILE = os.path.expanduser('~/.config/reinforce_webdb.cfg')
+DEFAULT_CONFIG_FILE = os.path.expanduser('~/.config/reinforce.io_db.cfg')
 
 
 def main():

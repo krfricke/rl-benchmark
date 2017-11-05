@@ -119,15 +119,30 @@ class LocalDatabase(BenchmarkDatabase):
         return dict(config_hash=config_hash, metadata=json.loads(metadata_txt), config=json.loads(config_txt))
 
     def save_benchmark(self, benchmark_data):
+        if not isinstance(benchmark_data, BenchmarkData):
+            benchmark_data = BenchmarkData(benchmark_data)
+
+        added_experiments = list()  # list of experiment ids that have been added to the database
+        added_experiment_hashes = list()  # list of experiment hashes that have been added to the database
+        benchmark_hashes = list()  # list of benchmark hashes (both added and duplicates)
+        duplicate_experiments = list()  # list of experiment ids that already were in the database
+        duplicate_experiment_hashes = list()  # list of experiment hashes that already were in the database
 
         vars = list()
-        for experiment_data in benchmark_data:
+        for i, experiment_data in enumerate(benchmark_data):
             experiment_hash, benchmark_hash, config_hash = experiment_data.hash()
+
+            benchmark_hashes.append(benchmark_hash)
 
             # check if experiment already exists
             if (self.get_experiment(experiment_hash)):
                 logging.warning("Experiment with hash {} already exists, ignoring.".format(experiment_hash))
+                duplicate_experiments.append(i)
+                duplicate_experiment_hashes.append(experiment_hash)
                 continue
+
+            added_experiments.append(i)
+            added_experiment_hashes.append(experiment_hash)
 
             config = experiment_data.get('config', dict())
             metadata = experiment_data.get('metadata', dict())
@@ -165,7 +180,13 @@ class LocalDatabase(BenchmarkDatabase):
         else:
             logging.warning("No rows inserted.")
 
-        return True
+        return dict(
+            added_experiments=added_experiments,
+            added_experiment_hashes=added_experiment_hashes,
+            benchmark_hashes=benchmark_hashes,
+            duplicate_experiments=duplicate_experiments,
+            duplicate_experiment_hashes=duplicate_experiment_hashes
+        )
 
     def search_by_config(self, config):
         pass

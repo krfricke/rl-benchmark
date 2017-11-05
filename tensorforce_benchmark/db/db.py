@@ -66,7 +66,7 @@ class BenchmarkDatabase(object):
         Args:
             benchmark_data: `BenchmarkData` object
 
-        Returns: boolean
+        Returns: benchmark_hash
 
         """
         raise NotImplementedError

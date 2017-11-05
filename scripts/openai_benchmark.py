@@ -77,11 +77,18 @@ import logging
 import os
 import sys
 
-from tensorforce_benchmark.benchmark.runner import BenchmarkRunner
 from tensorforce.contrib.openai_gym import OpenAIGym
 
+from tensorforce_benchmark.benchmark.runner import BenchmarkRunner
+from tensorforce_benchmark.db import LocalDatabase, WebDatabase
+from tensorforce_benchmark.cli.util import load_config
 
-logging.basicConfig(level=logging.DEBUG)
+
+DEFAULT_CONFIG_FILE = os.path.expanduser('~/.config/reinforce.io_db.cfg')
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 def main():
@@ -89,9 +96,15 @@ def main():
 
     parser.add_argument('algorithm', help="Algorithm name (config file)")
     parser.add_argument('gym_id', help="ID of the gym environment")
-    parser.add_argument('-o', '--output', help="output file (pickle pkl)")
     parser.add_argument('-x', '--experiments', default=1, type=int,
                         help="number of times to run the benchmark")
+    parser.add_argument('-C', '--config-file', default=DEFAULT_CONFIG_FILE,
+                        help="config file (for database configuration)")
+    parser.add_argument('-D', '--no-db-store', action='store_true', default=False,
+                        help="Don't save results into local benchmark database.")
+    parser.add_argument('-P', '--push', action='store_true', default=False,
+                        help="Push results to web database.")
+    parser.add_argument('-o', '--output', help="output file (pickle pkl)")
     parser.add_argument('-a', '--append', action='store_true', default=False,
                         help="Append data to existing pickle file?")
     parser.add_argument('-f', '--force', action='store_true', default=False,
@@ -107,9 +120,6 @@ def main():
 
     args = parser.parse_args()
 
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
-
     root = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
 
     benchmark_runner = BenchmarkRunner(
@@ -119,21 +129,30 @@ def main():
 
     benchmark_runner.load_config(args.algorithm)
 
-    # Set output file name
-    if args.algorithm.endswith('.json'):
-        output_filename = os.path.join(root, 'benchmarks', '{}_{}.pkl'.format(
-            args.algorithm.replace('.', '_').replace('/', '__'), args.gym_id
-        ))
-    else:
-        output_filename = os.path.join(root, 'benchmarks', '{}_{}.pkl'.format(
-            args.algorithm, args.gym_id
-        ))
+    if args.no_db_store and not args.push and not args.output:
+        logger.error("Benchmark should not be stored to local db (--no-db-store), not pushed to web db (no --push), "
+                      "and not saved to local file (no --output). Aborting.")
+        return 1
+
+    output_path = None
+    if args.output:
+        if args.output == '-':
+            # Set output file name
+            if args.algorithm.endswith('.json'):
+                output_path = os.path.join(benchmark_runner.output_folder, '{}_{}.pkl'.format(
+                    args.algorithm.replace('.', '_').replace('/', '__'), args.gym_id
+                ))
+            else:
+                output_path = os.path.join(benchmark_runner.output_folder, '{}_{}.pkl'.format(
+                    args.algorithm, args.gym_id
+                ))
+        else:
+            output_path = os.path.join(os.getcwd(), args.output)
 
     # Check if output file exists and should not be overwritten or appended to - we should not start the benchmark then
-    if os.path.exists(os.path.join(benchmark_runner.output_folder, output_filename)) \
-        and not args.force and not args.append:
-        logging.error("Output file exists but should not be extended or overwritten, aborting.")
-        return 1
+        if os.path.exists(output_path) and not args.force and not args.append:
+            logger.error("Output file exists but should not be extended or overwritten, aborting.")
+            return 1
 
     if args.load_model:
         benchmark_runner.load_model(args.load_model)
@@ -151,7 +170,30 @@ def main():
         save_model_file=args.model
     )
 
-    benchmark_runner.save_results(output_file=output_filename, append=args.append, force=args.force)
+    config = load_config(args.config_file, default_config_file=DEFAULT_CONFIG_FILE)
+
+    if not args.no_db_store:
+        local_db = LocalDatabase(**config)
+        save_info = benchmark_runner.save_results_db(db=local_db)
+        if not save_info:
+            logger.error("Could not save results to local database.")
+        else:
+            logger.info("Saved results to local database:")
+            logger.info("Benchmark hash: {}".format(save_info['benchmark_hashes'][0]))
+            logger.info("Experiment hashes: {}".format(', '.join(save_info['added_experiment_hashes'])))
+
+    if args.push:
+        web_db = WebDatabase(**config)
+        save_info = benchmark_runner.save_results_db(db=web_db)
+        if not save_info:
+            logger.error("Could not save results to web database (insufficient access?).")
+        else:
+            logger.info("Saved results to web database:")
+            logger.info("Benchmark hash: {}".format(save_info['benchmark_hashes'][0]))
+            logger.info("Experiment hashes: {}".format(', '.join(save_info['added_experiment_hashes'])))
+
+    if output_path:
+        benchmark_runner.save_results_file(output_file=output_path, append=args.append, force=args.force)
 
     return 0
 

@@ -73,7 +73,10 @@ class WebDatabase(BenchmarkDatabase):
         result = self.call_api('/experiment', method='post', json=benchmark_data)
         if result.status_code >= 400:
             return False
-        return True
+
+        result_info = result.json()
+
+        return result_info
 
     def search_by_config(self, config):
         raise NotImplementedError

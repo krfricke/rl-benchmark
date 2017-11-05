@@ -8,7 +8,8 @@ In this repository we provide scripts for creating and analyzing benchmarks
 Creating benchmarks
 -------------------
 
-You can easily create benchmarks using pre-supplied config files or your own configurations.
+You can easily create benchmarks using pre-supplied config files or your own configurations. Per default, benchmarks
+are stored in a local (sqlite) database.
 
 ```bash
 python scripts/openai_benchmark.py [--output output] [--experiments num_experiments] [--append] [--model <path>] [--save-model <num_episodes>] [--load-model <path>] [--history <file>] [--history-episodes <num_episodes>] [--load-history <file>] <algorithm> <gym_id>
@@ -49,7 +50,7 @@ Analyzing benchmarks
 At the moment, we provide plotting of the results obtained from our benchmarking script.
 
 ```bash
-python plot_results.py [--output output] [--show-episodes] [--show-timesteps] [--show-seconds] [--input <file> <name>] [--input <file> <name> ...]
+python scripts/plot_results.py [--output output] [--show-episodes] [--show-timesteps] [--show-seconds] [--input <file> <name>] [--input <file> <name> ...]
 ```
 
 `input` expects two parameters. `file` points to a pickle file (pkl) containing experiment data (e.g. created by

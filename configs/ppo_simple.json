@@ -1,6 +1,6 @@
 {
     "agent": "ppo_agent",
-    "episodes": 2500,
+    "episodes": 200,
     "max_timesteps": 200,
 
     "log_level": "info",

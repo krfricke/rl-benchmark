@@ -41,7 +41,6 @@ class BenchmarkRunner(object):
         self.config_folder = config_folder
         self.output_folder = output_folder
 
-        self.output_filename = None
         self.history_data = None
         self.load_model_file = None
 
@@ -271,7 +270,20 @@ class BenchmarkRunner(object):
 
             self.current_run_results.append(experiment_data)
 
-    def save_results(self, output_file, append=False, force=False):
+    def save_results_db(self, db):
+        """
+        Save results to database.
+
+        Args:
+            db: `Database` object
+
+        Returns: dict containing returned information on save status
+
+        """
+        benchmark_data = self.current_run_results
+        return db.save_benchmark(benchmark_data)
+
+    def save_results_file(self, output_file, append=False, force=False):
         """
         Save results to file.
 
@@ -280,7 +292,7 @@ class BenchmarkRunner(object):
             append: Boolean indicating whether to append data if output file exists
             force: Boolean indicating whether to overwrite data if output file exists (append has preference)
 
-        Returns:
+        Returns: boolean
 
         """
         output_file_path = os.path.join(self.output_folder, output_file)
@@ -302,3 +314,4 @@ class BenchmarkRunner(object):
         with open(output_file_path, 'wb') as fp:
             pickle.dump(benchmark_data, fp)
 
+        return True

@@ -81,7 +81,7 @@ class CreateConfigCommand(Command):
         with open(config_file, 'w') as fp:
             json.dump(config, fp, sort_keys=True)
         os.chmod(config_file, 0o600)
-        print("Wrote configuration to {}".format(self.config_file))
+        print("Wrote configuration to {}".format(self.context['config_file']))
 
         return 0
 

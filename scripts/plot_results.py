@@ -46,6 +46,8 @@ from tensorforce_benchmark.analyze.plotter import ResultPlotter
 from tensorforce_benchmark.data import BenchmarkData
 
 logging.basicConfig()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 def main():
