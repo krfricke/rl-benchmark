@@ -229,9 +229,9 @@ class BenchmarkRunner(object):
 
             logging.info("Starting experiment {:d}".format(i + 1))
 
-            with tqdm(total=config.episodes, desc='Experiment {:d}'.format(i + 1)) as self.progress_bar:
+            with tqdm(total=config.max_episodes, desc='Experiment {:d}'.format(i + 1)) as self.progress_bar:
                 experiment_start_time = int(time.time())
-                runner.run(episodes=config.episodes, max_episode_timesteps=config.max_timesteps,
+                runner.run(episodes=config.max_episodes, max_episode_timesteps=config.max_episode_timesteps,
                            episode_finished=self.episode_finished)
                 experiment_end_time = int(time.time())
 
@@ -246,8 +246,8 @@ class BenchmarkRunner(object):
                 ),
                 metadata=dict(
                     agent=config.agent,
-                    episodes=config.episodes,
-                    max_timesteps=config.max_timesteps,
+                    episodes=config.max_episodes,
+                    max_timesteps=config.max_episode_timesteps,
                     environment_domain=self.environment_domain,
                     environment_name=self.environment_name,
                     tensorforce_version=tensorforce_version,

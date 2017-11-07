@@ -1,7 +1,7 @@
 {
     "agent": "trpo_agent",
-    "episodes": 5000,
-    "max_timesteps": 200,
+    "max_episodes": 5000,
+    "max_episode_timesteps": 200,
 
     "log_level": "info",
 

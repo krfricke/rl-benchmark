@@ -1,7 +1,7 @@
 {
   "agent": "DQNAgent",
-  "episodes": 15000,
-  "max_timesteps": 10000,
+  "max_episodes": 15000,
+  "max_episode_timesteps": 10000,
 
   "preprocessing": [
     {
