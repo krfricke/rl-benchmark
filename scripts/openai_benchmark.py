@@ -80,7 +80,7 @@ import sys
 from tensorforce.contrib.openai_gym import OpenAIGym
 
 from tensorforce_benchmark import default_config_file as DEFAULT_CONFIG_FILE
-from tensorforce_benchmark.benchmark.runner import BenchmarkRunner
+from tensorforce_benchmark.benchmark.runner import TensorForceBenchmarkRunner
 from tensorforce_benchmark.db import LocalDatabase, WebDatabase
 from tensorforce_benchmark.cli.util import load_config
 
@@ -121,7 +121,7 @@ def main():
 
     root = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
 
-    benchmark_runner = BenchmarkRunner(
+    benchmark_runner = TensorForceBenchmarkRunner(
         config_folder=os.path.join(root, 'configs'),
         output_folder=os.path.join(root, 'benchmarks')
     )

@@ -18,5 +18,6 @@ from __future__ import division
 from __future__ import print_function
 
 from tensorforce_benchmark.benchmark.runner.benchmark_runner import BenchmarkRunner
+from tensorforce_benchmark.benchmark.runner.tensorforce import TensorForceBenchmarkRunner
 
-__all__ = ['BenchmarkRunner']
+__all__ = ['BenchmarkRunner', 'TensorForceBenchmarkRunner']

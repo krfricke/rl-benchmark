@@ -30,9 +30,8 @@ from tqdm import tqdm
 
 from tensorflow import __version__ as tensorflow_version
 
-from tensorforce.agents import agents
+
 from tensorforce import Configuration, __version__ as tensorforce_version
-from tensorforce.execution import Runner
 
 from tensorforce_benchmark.util import load_config_file
 
@@ -46,8 +45,6 @@ class BenchmarkRunner(object):
         self.history_data = None
         self.load_model_file = None
 
-        self.report_episodes = 10
-
         self.save_history_file = None
         self.save_history_episodes = 0
 
@@ -56,11 +53,11 @@ class BenchmarkRunner(object):
 
         self.current_run_results = None
 
-        self.environment_callback = None
+        self.report_episodes = 10
+        self.progress_bar = None
+
         self.environment_domain = 'user'
         self.environment_name = None
-
-        self.progress_bar = None
 
     def load_config(self, filename):
         """
@@ -87,26 +84,41 @@ class BenchmarkRunner(object):
         self.config = config
         return True
 
-    def set_environment(self, environment_class, *args, **kwargs):
+    def set_environment(self, environment, *args, **kwargs):
         """
-        Set environment class and store as callback
+        Set environment and store as callback.
 
         Args:
-            environment_class:
+            environment: Environment object
             *args: arguments to pass to environment class constructor
             **kwargs: keyword arguments to pass to environment class constructor
 
         Returns:
 
         """
-        self.environment_callback = (environment_class, args, kwargs)
+        raise NotImplementedError
 
-        if environment_class.__name__ == 'OpenAIGym':
-            self.environment_domain = 'openai_gym'
-            self.environment_name = args[0]
-        else:
-            self.environment_domain = 'user'
-            self.environment_name = environment_class.__name__
+    def make_environment(self):
+        """
+        Create environment.
+
+        Returns: environment
+
+        """
+        raise NotImplementedError
+
+    def run_experiment(self, environment, experiment_num=0):
+        """
+        Learn.
+
+        Args:
+            environment: environment
+            experiment_num: experiment number
+
+        Returns:
+
+        """
+        raise NotImplementedError
 
     def load_history(self, history_file):
         """
@@ -135,12 +147,12 @@ class BenchmarkRunner(object):
         logging.info("Loading model data from {}".format(model_file))
         self.load_model_file = model_file
 
-    def episode_finished(self, runner):
+    def episode_finished(self, results):
         """
         Callback that is called from the runner after each finished episode. Outputs result summaries and saves history.
 
         Args:
-            runner: TensorForce `Runner` object
+            results: results object (or TensorForce runner)
 
         Returns: Boolean indicating whether to continue run or not.
 
@@ -148,26 +160,26 @@ class BenchmarkRunner(object):
         if self.progress_bar:
             self.progress_bar.update(1)
             self.progress_bar.set_postfix(OrderedDict([
-                ('R', '{:8.0f}'.format(runner.episode_rewards[-1])),
-                ('AR100', '{:8.2f}'.format(np.mean(runner.episode_rewards[-100:]))),
-                ('AR500', '{:8.2f}'.format(np.mean(runner.episode_rewards[-500:])))
+                ('R', '{:8.0f}'.format(results.episode_rewards[-1])),
+                ('AR100', '{:8.2f}'.format(np.mean(results.episode_rewards[-100:]))),
+                ('AR500', '{:8.2f}'.format(np.mean(results.episode_rewards[-500:])))
             ]))
         else:
-            if runner.episode % self.report_episodes == 0:
-                logging.info("Finished episode {ep} after {ts} timesteps".format(ep=runner.episode, ts=runner.episode_timestep))
-                logging.info("Episode reward: {}".format(runner.episode_rewards[-1]))
-                logging.info("Average of last 500 rewards: {:.2f}".format(np.mean(runner.episode_rewards[-500:])))
-                logging.info("Average of last 100 rewards: {:.2f}".format(np.mean(runner.episode_rewards[-100:])))
+            if results.episode % self.report_episodes == 0:
+                logging.info("Finished episode {ep} after {ts} timesteps".format(ep=results.episode, ts=results.episode_timestep))
+                logging.info("Episode reward: {}".format(results.episode_rewards[-1]))
+                logging.info("Average of last 500 rewards: {:.2f}".format(np.mean(results.episode_rewards[-500:])))
+                logging.info("Average of last 100 rewards: {:.2f}".format(np.mean(results.episode_rewards[-100:])))
 
         if self.save_history_file and self.save_history_episodes > 0:
-            if runner.episode % self.save_history_episodes == 0:
+            if results.episode % self.save_history_episodes == 0:
                 logging.debug("Saving benchmark history to {}".format(self.save_history_file))
                 history_data = dict(
-                    episode=runner.episode,
-                    timestep=runner.episode_timestep,
-                    episode_rewards=copy(runner.episode_rewards),
-                    episode_timesteps=copy(runner.episode_timesteps),
-                    episode_end_times=copy(runner.episode_times)
+                    episode=results.episode,
+                    timestep=results.episode_timestep,
+                    episode_rewards=copy(results.episode_rewards),
+                    episode_timesteps=copy(results.episode_timesteps),
+                    episode_end_times=copy(results.episode_times)
                 )
 
                 with open(self.save_history_file, 'wb') as fp:
@@ -193,57 +205,22 @@ class BenchmarkRunner(object):
 
         logging.info("Running benchmark with {:d} experiments".format(experiments))
 
-        (environment_class, environment_args, environment_kwargs) = self.environment_callback
-
         for i in xrange(experiments):
             config = self.config.copy()
 
-            environment = environment_class(*environment_args, **environment_kwargs)
-
-            agent = agents[config.agent](states_spec=environment.states,
-                                         actions_spec=environment.actions,
-                                         network_spec=config.network,
-                                         config=config)
-
-            if i == 0 and self.history_data:
-                logging.info("Attaching history data to runner")
-                history_data = self.history_data
-            else:
-                history_data = None
-
-            if i == 0 and self.load_model_file:
-                logging.info("Loading model data from file: {}".format(self.load_model))
-                agent.load_model(self.load_model_file)
-
-            runner = Runner(
-                agent=agent,
-                environment=environment,
-                repeat_actions=1,
-                history=history_data
-                # save_path=args.model,
-                # save_episodes=args.save_model
-            )
-
-            environment.reset()
-            agent.reset()
+            environment = self.make_environment()
 
             logging.info("Starting experiment {:d}".format(i + 1))
 
             with tqdm(total=config.max_episodes, desc='Experiment {:d}'.format(i + 1)) as self.progress_bar:
                 experiment_start_time = int(time.time())
-                runner.run(episodes=config.max_episodes, max_episode_timesteps=config.max_episode_timesteps,
-                           episode_finished=self.episode_finished)
+                results = self.run_experiment(environment, i)
                 experiment_end_time = int(time.time())
 
             logging.info("Learning finished. Total episodes: {ep}".format(ep=runner.episode))
 
             experiment_data = dict(
-                results=dict(
-                    initial_reset_time=0,
-                    episode_rewards=runner.episode_rewards,
-                    episode_timesteps=runner.episode_timesteps,
-                    episode_end_times=runner.episode_times
-                ),
+                results=results,
                 metadata=dict(
                     agent=config.agent,
                     episodes=config.max_episodes,
