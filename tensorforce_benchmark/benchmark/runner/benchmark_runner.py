@@ -217,7 +217,7 @@ class BenchmarkRunner(object):
                 results = self.run_experiment(environment, i)
                 experiment_end_time = int(time.time())
 
-            logging.info("Learning finished. Total episodes: {ep}".format(ep=runner.episode))
+            logging.info("Learning finished.")
 
             experiment_data = dict(
                 results=results,

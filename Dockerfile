@@ -40,4 +40,4 @@ RUN pip install -e .
 
 RUN [ -d benchmarks ] || mkdir benchmarks && rm -rf benchmarks/*
 
-ENTRYPOINT ["python", "scripts/openai_benchmark.py"]
+ENTRYPOINT ["python", "scripts/benchmark_gym.py"]

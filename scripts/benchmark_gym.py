@@ -19,7 +19,7 @@ TensorForce benchmarking.
 Usage:
 
 ```bash
-python openai_benchmark.py [--output output] [--experiments num_experiments] [--append] [--model <path>] [--save-model <num_episodes>] [--load-model <path>] [--history <file>] [--history-episodes <num_episodes>] [--load-history <file>] <algorithm> <gym_id>
+python benchmark_gym.py [--output output] [--experiments num_experiments] [--append] [--model <path>] [--save-model <num_episodes>] [--load-model <path>] [--history <file>] [--history-episodes <num_episodes>] [--load-history <file>] <algorithm> <gym_id>
 ```
 
 `algorithm` specifies which config file to use. You can pass the path to a valid json config file, or a string
