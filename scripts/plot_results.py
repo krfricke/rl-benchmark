@@ -42,8 +42,11 @@ import matplotlib.pyplot as plt
 import os
 import sys
 
+from tensorforce_benchmark import default_config_file as DEFAULT_CONFIG_FILE
 from tensorforce_benchmark.analyze.plotter import ResultPlotter
 from tensorforce_benchmark.data import BenchmarkData
+from tensorforce_benchmark.cli.util import load_config
+from tensorforce_benchmark.db import LocalDatabase, WebDatabase
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -53,10 +56,11 @@ logger.setLevel(logging.INFO)
 def main():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-i', '--input', action='append', nargs=2, metavar=('file', 'name'),
-                        help="Input file(s): <file> <name>")
+    parser.add_argument('-i', '--input', action='append', nargs=2, metavar=('benchmark', 'name'),
+                        help="Input file(s) or hashes")
     parser.add_argument('-o', '--output', default="output.png", help="output file (image png)")
-
+    parser.add_argument('-C', '--config-file', default=DEFAULT_CONFIG_FILE,
+                        help="config file (for database configuration)")
     parser.add_argument('-E', '--show-episodes', action='store_true', default=False,
                         help="show rewards by episode number")
     parser.add_argument('-T', '--show-timesteps', action='store_true', default=False,
@@ -73,15 +77,17 @@ def main():
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
 
+    config = load_config(args.config_file, default_config_file=DEFAULT_CONFIG_FILE)
+
+    local_db = LocalDatabase(**config)
+
     plotter = ResultPlotter()
 
     # load input files into data dict
-    data = dict()
-    for (filename, name) in args.input:
-        path = os.path.join(os.getcwd(), filename)
-        logger.info("Loading {} ({})".format(filename, name))
+    for (benchmark_lookup, name) in args.input:
+        logger.info("Loading {} ({})".format(benchmark_lookup, name))
 
-        benchmark_data = BenchmarkData.from_file(filename)
+        benchmark_data = BenchmarkData.from_file_or_hash(benchmark_lookup, db=local_db)
         plotter.add_benchmark(benchmark_data, name)
 
     num_plots = 0

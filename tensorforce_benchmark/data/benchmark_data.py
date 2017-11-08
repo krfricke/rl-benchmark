@@ -18,6 +18,7 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+import os
 import pickle
 
 from tensorforce_benchmark.data import ExperimentData
@@ -33,6 +34,37 @@ class BenchmarkData(list):
         for experiment_data in self:
             values.append(np.max(experiment_data.to_timeseries()[var]))
         return np.min(values)
+
+    @staticmethod
+    def from_file_or_hash(benchmark_lookup, db=None):
+        """
+        Load benchmark data from file or hash. First checks database(s) for hash, then files. Returns first match.
+
+        Args:
+            benchmark_lookup: string of filename, or file object, or local db hash
+            db: `BenchmarkDatabase` object or list or `BenchmarkDatabase` objects
+
+        Returns: BenchmarkData object
+
+        """
+        if isinstance(db, list):
+            dbs = db
+        else:
+            dbs = [db]
+
+        # Check for hash
+        if isinstance(benchmark_lookup, str) and len(benchmark_lookup) == 40:
+            for db in dbs:
+                if not db:
+                    continue
+                benchmark_data = db.get_benchmark(benchmark_lookup)
+                if benchmark_data:
+                    return benchmark_data
+
+        if isinstance(benchmark_lookup, file) or os.path.exists(benchmark_lookup):
+            return BenchmarkData.from_file(benchmark_lookup)
+        else:
+            raise ValueError("Could not find benchmark in db and fs: {}".format(benchmark_lookup))
 
     @staticmethod
     def from_file(filename):

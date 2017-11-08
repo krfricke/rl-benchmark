@@ -32,8 +32,11 @@ def load_config(config_file, silent=False, default_config=None, default_config_f
         config = copy.copy(default_config)
     else:
         config = dict()
-    if os.path.exists(config_file):
-        with open(config_file, 'r') as fp:
+
+    config_path = os.path.expanduser(config_file)
+
+    if os.path.exists(config_path):
+        with open(config_path, 'r') as fp:
             config.update(json.load(fp))
     elif not silent:
         if config_file == default_config_file:

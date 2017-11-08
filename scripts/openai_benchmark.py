@@ -79,12 +79,11 @@ import sys
 
 from tensorforce.contrib.openai_gym import OpenAIGym
 
+from tensorforce_benchmark import default_config_file as DEFAULT_CONFIG_FILE
 from tensorforce_benchmark.benchmark.runner import BenchmarkRunner
 from tensorforce_benchmark.db import LocalDatabase, WebDatabase
 from tensorforce_benchmark.cli.util import load_config
 
-
-DEFAULT_CONFIG_FILE = os.path.expanduser('~/.config/reinforce.io_db.cfg')
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

@@ -146,7 +146,7 @@ class LocalDatabase(BenchmarkDatabase):
 
             config = experiment_data.get('config', dict())
             metadata = experiment_data.get('metadata', dict())
-            results = experiment_data.get('metadata', dict())
+            results = experiment_data.get('results', dict())
 
             vars.append((
                 experiment_hash,
