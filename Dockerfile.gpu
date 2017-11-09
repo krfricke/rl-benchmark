@@ -28,14 +28,16 @@ RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
     python get-pip.py && \
     rm get-pip.py
  
-WORKDIR /
-ADD . /
+WORKDIR /tensorforce-benchmark
+ADD . .
 
 RUN rm -rf *.png _cmd_*.txt
 
 # Add TensorForce dependencies
 RUN pip install -r requirements_benchmark_gpu.txt
 
+RUN pip install -e .
+
 RUN [ -d benchmarks ] || mkdir benchmarks && rm -rf benchmarks/*
 
-ENTRYPOINT ["python", "benchmark.py"]
+ENTRYPOINT ["python", "scripts/benchmark_gym.py"]
