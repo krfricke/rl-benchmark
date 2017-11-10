@@ -30,9 +30,7 @@ from tqdm import tqdm
 
 from tensorflow import __version__ as tensorflow_version
 
-
 from tensorforce import Configuration, __version__ as tensorforce_version
-
 from tensorforce_benchmark.util import load_config_file
 
 
@@ -236,6 +234,8 @@ class BenchmarkRunner(object):
             )
 
             self.current_run_results.append(experiment_data)
+
+        return self.current_run_results
 
     def save_results_db(self, db):
         """
