@@ -78,12 +78,12 @@ def to_timeseries(benchmark_data, x_label='Episode', y_label='Average Episode Re
     data_experiments, data_times, data_values = [], [], []
 
     for experiment_id, experiment_data in enumerate(benchmark_data):
-        tsdata = experiment_data.to_timeseries()
+        extended_results = experiment_data.extended_results()
 
         if smooth > 0:
-            tsdata['rewards'] = np.array(pd.Series(tsdata['rewards']).ewm(span=smooth).mean())
+            extended_results['rewards'] = np.array(pd.Series(extended_results['rewards']).ewm(span=smooth).mean())
 
-        x, y = target(cut_x=cut_x, **tsdata)
+        x, y = target(cut_x=cut_x, **extended_results)
 
         data_times.extend(x)
         data_values.extend(y)

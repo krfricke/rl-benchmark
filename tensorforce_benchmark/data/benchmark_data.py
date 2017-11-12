@@ -32,7 +32,7 @@ class BenchmarkData(list):
     def min_x(self, var):
         values = list()
         for experiment_data in self:
-            values.append(np.max(experiment_data.to_timeseries()[var]))
+            values.append(np.max(experiment_data.extended_results()[var]))
         return np.min(values)
 
     @staticmethod

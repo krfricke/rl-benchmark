@@ -60,7 +60,7 @@ class ExperimentData(dict):
         return experiment_hash, benchmark_hash, config_hash
 
 
-    def to_timeseries(self):
+    def extended_results(self):
         rewards = np.array(self['results']['episode_rewards'])  # turn rewards into numpy array
 
         episode_timesteps = np.array(self['results']['episode_timesteps'])  # episode lengths
