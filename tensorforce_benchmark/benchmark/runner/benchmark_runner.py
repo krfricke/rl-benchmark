@@ -30,7 +30,7 @@ from tqdm import tqdm
 
 from tensorflow import __version__ as tensorflow_version
 
-from tensorforce import Configuration, __version__ as tensorforce_version
+from tensorforce import __version__ as tensorforce_version
 from tensorforce_benchmark.util import load_config_file
 
 
@@ -60,15 +60,15 @@ class BenchmarkRunner(object):
     def load_config(self, filename):
         """
         Load config from file. Either state a file from the config_folder (with or without file suffix),
-        or supply full file path, or pass `tensorforce.config.Configuration` object.
+        or supply full file path, or pass configuration dict object.
 
         Args:
-            filename: Filename, or full file path, or `tensorforce.config.Configuration` object
+            filename: Filename, or full file path, or dict object
 
         Returns: Boolean
 
         """
-        if isinstance(filename, Configuration):
+        if isinstance(filename, dict):
             config = filename
         else:
             config = load_config_file(filename, config_folder=self.config_folder)
@@ -204,13 +204,13 @@ class BenchmarkRunner(object):
         logging.info("Running benchmark with {:d} experiments".format(experiments))
 
         for i in xrange(experiments):
-            config = self.config.copy()
+            config = copy(self.config)
 
             environment = self.make_environment()
 
             logging.info("Starting experiment {:d}".format(i + 1))
 
-            with tqdm(total=config.max_episodes, desc='Experiment {:d}'.format(i + 1)) as self.progress_bar:
+            with tqdm(total=config['max_episodes'], desc='Experiment {:d}'.format(i + 1)) as self.progress_bar:
                 experiment_start_time = int(time.time())
                 results = self.run_experiment(environment, i)
                 experiment_end_time = int(time.time())
@@ -220,9 +220,9 @@ class BenchmarkRunner(object):
             experiment_data = dict(
                 results=results,
                 metadata=dict(
-                    agent=config.agent,
-                    episodes=config.max_episodes,
-                    max_timesteps=config.max_episode_timesteps,
+                    agent=config['agent'],
+                    episodes=config['max_episodes'],
+                    max_timesteps=config['max_episode_timesteps'],
                     environment_domain=self.environment_domain,
                     environment_name=self.environment_name,
                     tensorforce_version=tensorforce_version,
@@ -230,7 +230,7 @@ class BenchmarkRunner(object):
                     start_time=experiment_start_time,
                     end_time=experiment_end_time
                 ),
-                config=dict(self.config.items())  # convert original Configuration object into dict
+                config=dict(self.config)  # make sure this is a dict
             )
 
             self.current_run_results.append(experiment_data)

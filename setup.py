@@ -30,7 +30,7 @@ install_requires=[
     'requests',
     'arghandler',
     'tqdm>=4.11.0',
-    'tensorforce>=0.3.0'
+    'tensorforce>=0.3.2'
 ]
 
 setup_requires=[
@@ -43,7 +43,7 @@ extras_require = {
 }
 
 setup(name='tensorforce_benchmark',
-      version='0.0.2',  # please remember to edit tensorforce_benchmark/__init__.py when updating the version
+      version='0.0.3',  # please remember to edit tensorforce_benchmark/__init__.py when updating the version
       description='TensorForce benchmarking package',
       url='http://github.com/reinforceio/tensorforce-benchmark',
       author='reinforce.io',

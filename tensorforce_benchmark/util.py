@@ -23,7 +23,6 @@ import json
 import logging
 import os
 
-from tensorforce.config import Configuration
 
 def hash_object(obj):
     json_str = json.dumps(obj, sort_keys=True)
@@ -48,7 +47,8 @@ def load_config_file(filename, config_folder=None):
             continue
 
         logging.debug("Found config file at {}".format(possible_config_file_path))
-        return Configuration.from_json(possible_config_file_path)
+        with open(possible_config_file_path, 'r') as fp:
+            return json.load(fp)
 
     return None
 

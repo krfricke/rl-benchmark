@@ -1,9 +1,7 @@
 {
-    "agent": "vpg_agent",
+    "type": "vpg_agent",
     "max_episodes": 5000,
     "max_episode_timesteps": 200,
-
-    "log_level": "info",
 
     "batch_size": 4000,
     "optimizer": {

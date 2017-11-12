@@ -23,7 +23,9 @@ from __future__ import division
 
 import logging
 
-from tensorforce.agents import agents
+from copy import copy
+
+from tensorforce.agents import Agent
 from tensorforce.execution import Runner
 
 from tensorforce_benchmark.benchmark.runner.benchmark_runner import BenchmarkRunner
@@ -63,12 +65,21 @@ class TensorForceBenchmarkRunner(BenchmarkRunner):
         return environment
 
     def run_experiment(self, environment, experiment_num=0):
-        config = self.config.copy()
+        config = copy(self.config)
 
-        agent = agents[config.agent](states_spec=environment.states,
-                                     actions_spec=environment.actions,
-                                     network_spec=config.network,
-                                     config=config)
+        max_episodes = config.pop('max_episodes')
+        max_episode_timesteps = config.pop('max_episode_timesteps')
+
+        network_spec = config.pop('network')
+
+        agent = Agent.from_spec(
+            spec=config,
+            kwargs=dict(
+                states_spec=environment.states,
+                actions_spec=environment.actions,
+                network_spec=network_spec
+            )
+        )
 
         if experiment_num == 0 and self.history_data:
             logging.info("Attaching history data to runner")
@@ -92,7 +103,7 @@ class TensorForceBenchmarkRunner(BenchmarkRunner):
         environment.reset()
         agent.reset()
 
-        runner.run(episodes=config.max_episodes, max_episode_timesteps=config.max_episode_timesteps,
+        runner.run(episodes=max_episodes, max_episode_timesteps=max_episode_timesteps,
                    episode_finished=self.episode_finished)
 
         return dict(

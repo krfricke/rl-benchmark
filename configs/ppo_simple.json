@@ -1,9 +1,7 @@
 {
-    "agent": "ppo_agent",
+    "type": "ppo_agent",
     "max_episodes": 1000,
     "max_episode_timesteps": 200,
-
-    "log_level": "info",
 
     "batch_size": 1024,
     "step_optimizer": {
