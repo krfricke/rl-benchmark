@@ -220,7 +220,7 @@ class BenchmarkRunner(object):
             experiment_data = dict(
                 results=results,
                 metadata=dict(
-                    agent=config['agent'],
+                    agent=config['type'],
                     episodes=config['max_episodes'],
                     max_timesteps=config['max_episode_timesteps'],
                     environment_domain=self.environment_domain,
