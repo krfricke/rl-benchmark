@@ -2,20 +2,20 @@
     "type": "trpo_agent",
     "max_episodes": 5000,
     "max_episode_timesteps": 200,
-
     "batch_size": 4000,
     "learning_rate": 1e-2,
-
     "discount": 0.99,
     "normalize_rewards": false,
     "entropy_regularization": null,
     "gae_lambda": null,
     "likelihood_ratio_clipping": null,
-
     "baseline_mode": "states",
     "baseline": {
         "type": "mlp",
-        "sizes": [32, 32]
+        "sizes": [
+            32,
+            32
+        ]
     },
     "baseline_optimizer": {
         "type": "multi_step",
@@ -25,7 +25,6 @@
         },
         "num_steps": 5
     },
-
     "network": [
         {
             "type": "dense",
