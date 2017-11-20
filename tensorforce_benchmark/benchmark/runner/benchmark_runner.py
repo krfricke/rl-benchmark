@@ -32,6 +32,7 @@ from tensorflow import __version__ as tensorflow_version
 
 from tensorforce import __version__ as tensorforce_version
 from tensorforce_benchmark.util import load_config_file
+from tensorforce_benchmark.data import BenchmarkData
 
 
 class BenchmarkRunner(object):
@@ -199,7 +200,7 @@ class BenchmarkRunner(object):
         self.save_model_file = save_model_file
         self.save_model_episodes = save_model_episodes
 
-        self.current_run_results = list()
+        self.current_run_results = BenchmarkData()
 
         logging.info("Running benchmark with {:d} experiments".format(experiments))
 

@@ -29,6 +29,9 @@ class BenchmarkData(list):
         for item in super(BenchmarkData, self).__iter__():
             yield ExperimentData(item)
 
+    def __getitem__(self, item):
+        return ExperimentData(super(BenchmarkData, self).__getitem__(item))
+
     def min_x(self, var):
         values = list()
         for experiment_data in self:

@@ -2,24 +2,24 @@
     "type": "ppo_agent",
     "max_episodes": 1000,
     "max_episode_timesteps": 200,
-
     "batch_size": 1024,
     "step_optimizer": {
         "type": "adam",
         "learning_rate": 5e-3
     },
     "optimization_steps": 2,
-
     "discount": 0.99,
     "normalize_rewards": false,
     "entropy_regularization": 0.0,
     "gae_lambda": 0.95,
     "likelihood_ratio_clipping": 0.2,
-
     "baseline_mode": "states",
     "baseline": {
-      "type": "mlp",
-      "sizes": [64, 64]
+        "type": "mlp",
+        "sizes": [
+            64,
+            64
+        ]
     },
     "baseline_optimizer": {
         "type": "multi_step",
@@ -29,13 +29,18 @@
         },
         "num_steps": 5
     },
-
     "preprocessing": [
         {
-            "type": "standardize"
+            "type": "running_standardize",
+            "axis": 0,
+            "reset_after_batch": false
+        },
+        {
+            "type": "clip",
+            "min": -5.0,
+            "max": 5.0
         }
     ],
-
     "network": [
         {
             "type": "dense",
