@@ -20,7 +20,8 @@ from __future__ import print_function
 import json
 import logging
 import requests
-import urlparse
+
+from six.moves import urllib
 
 from tensorforce_benchmark.db import Cache
 from tensorforce_benchmark.db.db import BenchmarkDatabase
@@ -82,7 +83,7 @@ class WebDatabase(BenchmarkDatabase):
         raise NotImplementedError
 
     def call_api(self, endpoint, method='get', force=False, **kwargs):
-        target_url = urlparse.urljoin(self.url, API_VERSION + endpoint)
+        target_url = urllib.urljoin(self.url, API_VERSION + endpoint)
 
         # Return cached get results
         if method == 'get' and not force:

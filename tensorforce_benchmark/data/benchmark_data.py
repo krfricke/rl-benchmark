@@ -64,7 +64,7 @@ class BenchmarkData(list):
                 if benchmark_data:
                     return benchmark_data
 
-        if isinstance(benchmark_lookup, file) or os.path.exists(benchmark_lookup):
+        if hasattr(benchmark_lookup, 'readline') or os.path.exists(benchmark_lookup):
             return BenchmarkData.from_file(benchmark_lookup)
         else:
             raise ValueError("Could not find benchmark in db and fs: {}".format(benchmark_lookup))
@@ -80,7 +80,7 @@ class BenchmarkData(list):
         Returns: BenchmarkData object
 
         """
-        if isinstance(filename, file):
+        if hasattr(filename, 'readline'):
             return BenchmarkData(pickle.load(filename))
         else:
             with open(filename, 'rb') as fp:
