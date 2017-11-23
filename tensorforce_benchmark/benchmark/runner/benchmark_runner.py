@@ -231,7 +231,7 @@ class BenchmarkRunner(object):
                     start_time=experiment_start_time,
                     end_time=experiment_end_time
                 ),
-                config=dict(self.config)  # make sure this is a dict
+                config=dict(config)  # make sure this is a dict
             )
 
             self.current_run_results.append(experiment_data)
