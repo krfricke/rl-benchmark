@@ -20,6 +20,7 @@ from __future__ import print_function
 import numpy as np
 import hashlib
 import json
+import yaml
 import logging
 import os
 
@@ -37,8 +38,10 @@ def load_config_file(filename, config_folder=None):
 
     if config_folder:
         possible_config_file_paths += [
-            os.path.join(config_folder, '{}'.format(filename)),  # check with user-supplied file suffix
-            os.path.join(config_folder, '{}.json'.format(filename))  # check with json suffix
+            os.path.join(config_folder, '{}'.format(filename)),  # check with user-supplied file suffix, expects json
+            os.path.join(config_folder, '{}.json'.format(filename)),  # check with json suffix
+            os.path.join(config_folder, '{}.yml'.format(filename)),  # check with yml suffix
+            os.path.join(config_folder, '{}.yaml'.format(filename))  # check with yaml suffix
         ]
 
     for possible_config_file_path in possible_config_file_paths:
@@ -48,7 +51,10 @@ def load_config_file(filename, config_folder=None):
 
         logging.debug("Found config file at {}".format(possible_config_file_path))
         with open(possible_config_file_path, 'r') as fp:
-            return json.load(fp)
+            if possible_config_file_path.endswith('yml') or possible_config_file_path.endswith('yaml'):
+                return yaml.load(fp)
+            else:
+                return json.load(fp)
 
     return None
 
