@@ -54,6 +54,7 @@ class BenchmarkRunner(object):
 
         self.report_episodes = 10
         self.progress_bar = None
+        self.limit_by_episodes = True  # if False, the run is limited by timesteps
 
         self.environment_domain = 'user'
         self.environment_name = None
@@ -157,7 +158,10 @@ class BenchmarkRunner(object):
 
         """
         if self.progress_bar:
-            self.progress_bar.update(1)
+            if self.limit_by_episodes:
+                self.progress_bar.update(1)
+            else:
+                self.progress_bar.update(results.episode_timestep)
             self.progress_bar.set_postfix(OrderedDict([
                 ('R', '{:8.0f}'.format(results.episode_rewards[-1])),
                 ('AR100', '{:8.2f}'.format(np.mean(results.episode_rewards[-100:]))),
@@ -202,6 +206,19 @@ class BenchmarkRunner(object):
 
         self.current_run_results = BenchmarkData()
 
+        max_episodes = self.config.get('max_episodes')
+        max_timesteps = self.config.get('max_timesteps')
+
+        assert bool(max_episodes) != bool(max_timesteps), 'Please limit either by episodes or by timesteps, not both'
+        assert bool(max_episodes) or bool(max_timesteps), 'Please give a time limit for the run (episodes or timesteps)'
+
+        if max_episodes:
+            self.limit_by_episodes = True
+            total = max_episodes
+        else:
+            self.limit_by_episodes = False
+            total = max_timesteps
+
         logging.info("Running benchmark with {:d} experiments".format(experiments))
 
         for i in xrange(experiments):
@@ -211,7 +228,7 @@ class BenchmarkRunner(object):
 
             logging.info("Starting experiment {:d}".format(i + 1))
 
-            with tqdm(total=config['max_episodes'], desc='Experiment {:d}'.format(i + 1)) as self.progress_bar:
+            with tqdm(total=total, desc='Experiment {:d}'.format(i + 1)) as self.progress_bar:
                 experiment_start_time = int(time.time())
                 results = self.run_experiment(environment, i)
                 experiment_end_time = int(time.time())
@@ -222,8 +239,9 @@ class BenchmarkRunner(object):
                 results=results,
                 metadata=dict(
                     agent=config['type'],
-                    episodes=config['max_episodes'],
-                    max_timesteps=config['max_episode_timesteps'],
+                    episodes=max_episodes,
+                    timesteps=max_timesteps,
+                    max_episode_timesteps=config['max_episode_timesteps'],
                     environment_domain=self.environment_domain,
                     environment_name=self.environment_name,
                     tensorforce_version=tensorforce_version,

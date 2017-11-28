@@ -153,8 +153,9 @@ class LocalDatabase(BenchmarkDatabase):
                 config_hash,
                 benchmark_hash,
                 metadata.get('agent'),
-                metadata.get('episodes'),
+                metadata.get('max_episodes'),
                 metadata.get('max_timesteps'),
+                metadata.get('max_episode_timesteps'),
                 metadata.get('environment_domain'),
                 metadata.get('environment_name'),
                 metadata.get('tensorforce_version'),
@@ -170,10 +171,11 @@ class LocalDatabase(BenchmarkDatabase):
             conn, cursor = self.connect_db()
 
             cursor.executemany("INSERT INTO experiments (experiment_hash, config_hash, benchmark_hash, "
-                               "md_agent, md_episode, md_max_timesteps, md_environment_domain, "
-                               "md_environment_name, md_tensorforce_version, md_tensorflow_version, "
+                               "md_agent, md_max_episodes, md_max_timesteps, md_max_episode_timesteps, "
+                               "md_environment_domain, md_environment_name, "
+                               "md_tensorforce_version, md_tensorflow_version, "
                                "start_time, end_time, metadata, config, results) VALUES "
-                               "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", vars)
+                               "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", vars)
             conn.commit()
 
             self.close_db()
@@ -218,7 +220,8 @@ class LocalDatabase(BenchmarkDatabase):
         conn, cursor = self.connect_db()
 
         cursor.execute("CREATE TABLE experiments (experiment_hash text, config_hash text, benchmark_hash text, "
-                       "md_agent text, md_episode text, md_max_timesteps text, md_environment_domain text, "
+                       "md_agent text, md_max_episodes integer, md_max_timesteps integer, "
+                       "md_max_episode_timesteps integer, md_environment_domain text, "
                        "md_environment_name text, md_tensorforce_version text, md_tensorflow_version text, "
                        "start_time integer, end_time integer, metadata text, config text, results text)")
 

@@ -67,7 +67,8 @@ class TensorForceBenchmarkRunner(BenchmarkRunner):
     def run_experiment(self, environment, experiment_num=0):
         config = copy(self.config)
 
-        max_episodes = config.pop('max_episodes')
+        max_episodes = config.pop('max_episodes', None)
+        max_timesteps = config.pop('max_timesteps', None)
         max_episode_timesteps = config.pop('max_episode_timesteps')
 
         network_spec = config.pop('network')
@@ -103,7 +104,7 @@ class TensorForceBenchmarkRunner(BenchmarkRunner):
         environment.reset()
         agent.reset()
 
-        runner.run(episodes=max_episodes, max_episode_timesteps=max_episode_timesteps,
+        runner.run(episodes=max_episodes, timesteps=max_timesteps, max_episode_timesteps=max_episode_timesteps,
                    episode_finished=self.episode_finished)
 
         return dict(
