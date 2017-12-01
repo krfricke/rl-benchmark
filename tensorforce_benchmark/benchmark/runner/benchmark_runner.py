@@ -214,10 +214,10 @@ class BenchmarkRunner(object):
 
         if max_episodes:
             self.limit_by_episodes = True
-            total = max_episodes
+            total = int(max_episodes)
         else:
             self.limit_by_episodes = False
-            total = max_timesteps
+            total = int(max_timesteps)
 
         logging.info("Running benchmark with {:d} experiments".format(experiments))
 
@@ -241,7 +241,7 @@ class BenchmarkRunner(object):
                     agent=config['type'],
                     episodes=max_episodes,
                     timesteps=max_timesteps,
-                    max_episode_timesteps=config['max_episode_timesteps'],
+                    max_episode_timesteps=config.get('max_episode_timesteps', 0),
                     environment_domain=self.environment_domain,
                     environment_name=self.environment_name,
                     tensorforce_version=tensorforce_version,
