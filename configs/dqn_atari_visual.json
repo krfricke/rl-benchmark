@@ -2,7 +2,7 @@
     "type": "dqn_agent",
     "max_episodes": 15000,
     "max_episode_timesteps": 10000,
-    "preprocessing": [
+    "states_preprocessing_spec": [
         {
             "type": "image_resize",
             "width": 84,
@@ -20,7 +20,7 @@
             "length": 4
         }
     ],
-    "exploration": {
+    "explorations_spec": {
         "type": "epsilon_anneal",
         "initial_epsilon": 1.0,
         "final_epsilon": 0.1,
@@ -30,7 +30,7 @@
     "memory": {
         "type": "replay",
         "random_sampling": true,
-        "capacity": 10000
+        "capacity": 100000
     },
     "update_frequency": 4,
     "first_update": 50000,
@@ -39,10 +39,8 @@
     "target_update_weight": 1.0,
     "discount": 0.99,
     "optimizer": {
-        "type": "rmsprop",
-        "learning_rate": 0.00025,
-        "decay": 0.99,
-        "epsilon": 1e-6
+        "type": "adam",
+        "learning_rate": 0.00025
     },
     "huber_loss": 1.0,
     "network": [
@@ -72,7 +70,7 @@
         },
         {
             "type": "dense",
-            "size": 512,
+            "size": 256,
             "bias": true
         }
     ]

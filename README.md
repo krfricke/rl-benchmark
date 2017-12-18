@@ -81,7 +81,7 @@ docker pull reinforceio/tensorforce-benchmark
 Afterwards, you can start your benchmark. You should provide a host directory for the output files:
 
 ```bash
-docker run -v /host/output:/benchmarks reinforceio/tensorforce-benchmark vpg_simple CartPole-v0
+docker run -v /host/output:/benchmarks reinforceio/tensorforce-benchmark ppo_cartpole CartPole-v0
 ```
 
 To provide your own configuration files, you can mount another host directory and pass the configuration file name as a parameter:

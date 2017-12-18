@@ -1,6 +1,9 @@
 {
     "type": "vpg_agent",
-    "batch_size": 5000,
+    "max_episodes": 10000,
+    "max_episode_timesteps": 200,
+
+    "batch_size": 512,
     "optimizer": {
         "type": "adam",
         "learning_rate": 0.01
@@ -21,5 +24,17 @@
             "learning_rate": 1e-3
         },
         "num_steps": 10
-    }
+    },
+    "network": [
+        {
+            "type": "dense",
+            "size": 32,
+            "activation": "tanh"
+        },
+        {
+            "type": "dense",
+            "size": 32,
+            "activation": "tanh"
+        }
+    ]
 }
