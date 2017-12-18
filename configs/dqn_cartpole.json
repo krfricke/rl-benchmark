@@ -3,7 +3,7 @@
     "max_timesteps": 1e5,
     "max_episode_timesteps": 200,
 
-    "batch_size": 32,
+    "batch_size": 128,
     "batched_observe": 1,
 
     "memory": {
@@ -14,22 +14,20 @@
 
     "optimizer": {
         "type": "clipped_step",
-        "clipping_value": 0.01,
+        "clipping_value": 0.005,
         "optimizer": {
             "type": "adam",
-            "learning_rate": 1e-3
+            "learning_rate": 5e-4
         }
     },
 
-    "discount": 1.0,
+    "discount": 0.99,
 
     "variable_noise": null,
 
     "first_update": 1000,
     "update_frequency": 1,
     "repeat_update": 1,
-
-    "huber_loss": 1.0,
 
     "target_sync_frequency": 500,
     "target_update_weight": 1.0,
@@ -38,8 +36,8 @@
 
     "explorations_spec": {
         "type": "epsilon_anneal",
-        "initial_epsilon": 1.00,
-        "final_epsilon": 0.02,
+        "initial_epsilon": 0.8,
+        "final_epsilon": 0.01,
         "timesteps": 1e4
     },
 
@@ -47,6 +45,12 @@
         {
             "type": "dense",
             "size": 64,
+            "activation": "relu"
+        },
+
+        {
+            "type": "dense",
+            "size": 32,
             "activation": "relu"
         }
     ]
