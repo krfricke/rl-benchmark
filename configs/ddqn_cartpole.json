@@ -1,0 +1,56 @@
+{
+    "type": "ddqn_agent",
+    "max_timesteps": 1e5,
+    "max_episode_timesteps": 200,
+
+    "batch_size": 64,
+    "batched_observe": 1,
+
+    "memory": {
+        "type": "prioritized_replay",
+        "capacity": 50000,
+        "prioritization_weight": 0.2,
+        "prioritization_constant": 1e-6
+    },
+
+    "optimizer": {
+        "type": "clipped_step",
+        "clipping_value": 0.005,
+        "optimizer": {
+            "type": "adam",
+            "learning_rate": 5e-4
+        }
+    },
+
+    "discount": 0.99,
+
+    "variable_noise": null,
+
+    "first_update": 1000,
+    "update_frequency": 1,
+    "repeat_update": 1,
+
+    "target_sync_frequency": 500,
+    "target_update_weight": 1.0,
+
+    "explorations_spec": {
+        "type": "epsilon_anneal",
+        "initial_epsilon": 0.8,
+        "final_epsilon": 0.01,
+        "timesteps": 1e4
+    },
+
+    "network": [
+        {
+            "type": "dense",
+            "size": 64,
+            "activation": "relu"
+        },
+
+        {
+            "type": "dense",
+            "size": 32,
+            "activation": "relu"
+        }
+    ]
+}
