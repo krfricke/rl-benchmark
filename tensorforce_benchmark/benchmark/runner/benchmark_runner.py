@@ -147,12 +147,13 @@ class BenchmarkRunner(object):
         logging.info("Loading model data from {}".format(model_file))
         self.load_model_file = model_file
 
-    def episode_finished(self, results):
+    def episode_finished(self, results, runner_id):
         """
         Callback that is called from the runner after each finished episode. Outputs result summaries and saves history.
 
         Args:
             results: results object (or TensorForce runner)
+            runner_id: runner id for distributed execution
 
         Returns: Boolean indicating whether to continue run or not.
 

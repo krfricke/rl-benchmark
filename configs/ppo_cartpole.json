@@ -3,8 +3,14 @@
     "max_episodes": 500,
     "max_episode_timesteps": 200,
 
-    "batch_size": 512,
+    "update_mode": {
+        "unit": "episodes",
+        "batch_size": 32,
+        "frequency": 32
+    },
+
     "batched_observe": 512,
+
     "step_optimizer": {
         "type": "adam",
         "learning_rate": 1e-3

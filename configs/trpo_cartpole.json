@@ -2,13 +2,25 @@
     "type": "trpo_agent",
     "max_episodes": 5000,
     "max_episode_timesteps": 200,
-    "batch_size": 4000,
+
+    "update_mode": {
+        "unit": "episodes",
+        "batch_size": 20,
+        "frequency": 20
+    },
+    "memory": {
+        "type": "latest",
+        "include_next_states": false,
+        "capacity": 5000
+    },
+
     "learning_rate": 1e-2,
     "discount": 0.99,
 
     "entropy_regularization": null,
     "gae_lambda": null,
     "likelihood_ratio_clipping": null,
+
     "baseline_mode": "states",
     "baseline": {
         "type": "mlp",

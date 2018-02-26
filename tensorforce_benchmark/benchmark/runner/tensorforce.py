@@ -76,9 +76,9 @@ class TensorForceBenchmarkRunner(BenchmarkRunner):
         agent = Agent.from_spec(
             spec=config,
             kwargs=dict(
-                states_spec=environment.states,
-                actions_spec=environment.actions,
-                network_spec=network_spec
+                states=environment.states,
+                actions=environment.actions,
+                network=network_spec
             )
         )
 
