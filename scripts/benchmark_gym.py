@@ -126,7 +126,9 @@ def main():
         output_folder=os.path.join(root, 'benchmarks')
     )
 
-    benchmark_runner.load_config(args.algorithm)
+    if not benchmark_runner.load_config(args.algorithm):
+        logger.error("Config not found: {}".format(args.algorithm))
+        return 1
 
     if args.no_db_store and not args.push and not args.output:
         logger.error("Benchmark should not be stored to local db (--no-db-store), not pushed to web db (no --push), "
