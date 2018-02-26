@@ -1,16 +1,22 @@
 {
-    "type": "ddqn_agent",
+    "type": "dqn_agent",
     "max_timesteps": 1e5,
     "max_episode_timesteps": 200,
 
-    "batch_size": 64,
     "batched_observe": 1,
+
+    "update_mode": {
+        "unit": "timesteps",
+        "batch_size": 64,
+        "frequency": 4,
+        "first_update": 1000
+    },
 
     "memory": {
         "type": "prioritized_replay",
         "capacity": 50000,
         "prioritization_weight": 0.2,
-        "prioritization_constant": 1e-6
+        "include_next_states": true
     },
 
     "optimizer": {
@@ -26,18 +32,16 @@
 
     "variable_noise": null,
 
-    "first_update": 1000,
-    "update_frequency": 1,
-    "repeat_update": 1,
-
     "target_sync_frequency": 500,
     "target_update_weight": 1.0,
 
-    "explorations_spec": {
+    "double_q_model": true,
+
+    "actions_exploration": {
         "type": "epsilon_anneal",
         "initial_epsilon": 0.8,
         "final_epsilon": 0.01,
-        "timesteps": 1e4
+        "timesteps": 10000
     },
 
     "network": [
