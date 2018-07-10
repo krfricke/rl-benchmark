@@ -1,4 +1,4 @@
-# Copyright 2017 reinforce.io. All Rights Reserved.
+# Copyright 2018 The YARL Project. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # ==============================================================================
 
 """
-TensorForce benchmark result uploading and downloading.
+RL benchmark result uploading and downloading.
 
 Usage:
 
@@ -29,10 +29,10 @@ import logging
 import os
 import sys
 
-from tensorforce_benchmark import default_config_file as DEFAULT_CONFIG_FILE
-from tensorforce_benchmark.db import LocalDatabase, WebDatabase
-from tensorforce_benchmark.cli.util import load_config
-from tensorforce_benchmark.cli.db import commands as db_commands
+from rl_benchmark import default_config_file as DEFAULT_CONFIG_FILE
+from rl_benchmark.db import LocalDatabase, WebDatabase
+from rl_benchmark.cli.util import load_config
+from rl_benchmark.cli.db import commands as db_commands
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)

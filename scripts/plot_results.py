@@ -1,4 +1,4 @@
-# Copyright 2017 reinforce.io. All Rights Reserved.
+# Copyright 2018 The YARL Project. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # ==============================================================================
 
 """
-TensorForce benchmark result analysis and formatting.
+RL benchmark result analysis and formatting.
 
 Usage:
 
@@ -42,11 +42,11 @@ import matplotlib.pyplot as plt
 import os
 import sys
 
-from tensorforce_benchmark import default_config_file as DEFAULT_CONFIG_FILE
-from tensorforce_benchmark.analyze.plotter import ResultPlotter
-from tensorforce_benchmark.data import BenchmarkData
-from tensorforce_benchmark.cli.util import load_config
-from tensorforce_benchmark.db import LocalDatabase, WebDatabase
+from rl_benchmark import default_config_file as DEFAULT_CONFIG_FILE
+from rl_benchmark.analyze.plotter import ResultPlotter
+from rl_benchmark.data import BenchmarkData
+from rl_benchmark.cli.util import load_config
+from rl_benchmark.db import LocalDatabase, WebDatabase
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)

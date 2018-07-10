@@ -1,8 +1,8 @@
-tensorforce-benchmark: Benchmarking for TensorForce 
+rl-benchmark: Reinforcement learning benchmarking.
 ===================================================
 
 In this repository we provide scripts for creating and analyzing benchmarks
- of reinforcement learning algorithms created with the [TensorForce library](https://github.com/reinforceio/tensorforce).
+ of reinforcement learning algorithm implementations.
  
 
 Creating benchmarks
@@ -75,19 +75,19 @@ We provide a Docker image for benchmarking. The image currently only support cre
 Get started by pulling our docker image:
 
 ```bash
-docker pull reinforceio/tensorforce-benchmark
+docker pull yarl/rl-benchmark
 ```
 
 Afterwards, you can start your benchmark. You should provide a host directory for the output files:
 
 ```bash
-docker run -v /host/output:/benchmarks reinforceio/tensorforce-benchmark ppo_cartpole CartPole-v0
+docker run -v /host/output:/benchmarks yarl/rl-benchmark ppo_cartpole CartPole-v0
 ```
 
 To provide your own configuration files, you can mount another host directory and pass the configuration file name as a parameter:
 
 ```bash
-docker run -v /host/configs:/configs -v /host/output:/benchmarks reinforceio/tensorforce-benchmark my_config CartPole-v0
+docker run -v /host/configs:/configs -v /host/output:/benchmarks yarl/rl-benchmark my_config CartPole-v0
 ```
 
 ### Using tensorflow-gpu
@@ -97,13 +97,13 @@ We also provide a Docker image utilizing `tensorflow-gpu` on CUDA. You will need
 First, pull the gpu image:
 
 ```bash
-docker pull reinforceio/tensorforce-benchmark:latest-gpu
+docker pull yarl/rl-benchmark:latest-gpu
 ```
 
 Then, run using `nvidia-docker`:
 
 ```bash
-nvidia-docker run -v /host/configs:/configs -v /host/output:/benchmarks reinforceio/tensorforce-benchmark:latest-gpu my_config CartPole-v0
+nvidia-docker run -v /host/configs:/configs -v /host/output:/benchmarks yarl/rl-benchmark:latest-gpu my_config CartPole-v0
 ```
 
 ### Building Docker images
@@ -112,9 +112,9 @@ You can build the Docker images yourself using these commands:
 
 ```bash
 # CPU version
-docker build -f Dockerfile -t tensorforce-benchmark:latest .
+docker build -f Dockerfile -t rl-benchmark:latest .
 
 # GPU version
-nvidia-docker build -f Dockerfile.gpu -t tensorforce-benchmark:latest-gpu .
+nvidia-docker build -f Dockerfile.gpu -t rl-benchmark:latest-gpu .
 ```
 

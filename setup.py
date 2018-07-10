@@ -1,4 +1,4 @@
-# Copyright 2017 reinforce.io. All Rights Reserved.
+# Copyright 2018 The YARL Project. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,11 @@ from __future__ import division
 import os
 
 from setuptools import setup, find_packages
+
+# Read __version__ avoiding imports that might be in install_requires
+version_vars = dict()
+with open(os.path.join(os.path.dirname(__file__), 'rl_benchmark', 'version.py')) as fp:
+    exec(fp.read(), version_vars)
 
 install_requires=[
     'numpy',
@@ -43,14 +48,14 @@ extras_require = {
 
 }
 
-setup(name='tensorforce_benchmark',
-      version='0.0.3',  # please remember to edit tensorforce_benchmark/__init__.py when updating the version
-      description='TensorForce benchmarking package',
-      url='http://github.com/reinforceio/tensorforce-benchmark',
+setup(name='rl_benchmark',
+      version=version_vars['__version__'],
+      description='Reinforcement learning benchmarking package',
+      url='http://github.com/yarl-project/rl-benchmark',
       author='reinforce.io',
-      author_email='contact@reinforce.io',
+      author_email='dev@yarl-project.org',
       license='Apache 2.0',
-      packages=[package for package in find_packages() if package.startswith('tensorforce_benchmark')],
+      packages=[package for package in find_packages() if package.startswith('rl_benchmark')],
       install_requires=install_requires,
       setup_requires=setup_requires,
       extras_require=extras_require,

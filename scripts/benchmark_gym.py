@@ -1,4 +1,4 @@
-# Copyright 2017 reinforce.io. All Rights Reserved.
+# Copyright 2018 The YARL Project. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,18 +14,20 @@
 # ==============================================================================
 
 """
-TensorForce benchmarking.
+RL benchmarking.
 
 Usage:
 
 ```bash
-python benchmark_gym.py [--output output] [--experiments num_experiments] [--append] [--model <path>] [--save-model <num_episodes>] [--load-model <path>] [--history <file>] [--history-episodes <num_episodes>] [--load-history <file>] <algorithm> <gym_id>
+python benchmark_gym.py [--rl rl_library] [--output output] [--experiments num_experiments] [--append] [--model <path>] [--save-model <num_episodes>] [--load-model <path>] [--history <file>] [--history-episodes <num_episodes>] [--load-history <file>] <algorithm> <gym_id>
 ```
 
 `algorithm` specifies which config file to use. You can pass the path to a valid json config file, or a string
 indicating which prepared config to use (e.g. `dqn2015`).
 
 `gym_id` should be a valid [OpenAI gym ID](https://gym.openai.com/envs)
+
+`rl_library` should be the library you want to use for benchmarking (e.g. yarl).
 
 `output` is an optional parameter to set the output (pickle) file. If omitted, output will be saved in `./benchmarks`.
 
@@ -59,7 +61,7 @@ The dict has the following keys:
 * `initial_reset_time`: integer indicating starting timestamp (usually 0).
 * `episode_end_times`: list containing observed end times relativ to `initial_reset_time` (not working at the moment).
 * `info`: dict containing meta information about the experiment:
-    * `agent`: TensorForce agent used in the experiment.
+    * `agent`: Agent (algorithm) used in the experiment.
     * `episodes`: Episode count configuration item.
     * `max_timesteps`: Max timesteps configuration item.
     * `environment_name`: Environment name configuration item.
@@ -77,12 +79,12 @@ import logging
 import os
 import sys
 
-from tensorforce.contrib.openai_gym import OpenAIGym
+from tensorforce.contrib.openai_gym import OpenAIGym  # Todo: use own environment wrapper? Or switch to yarl?
 
-from tensorforce_benchmark import default_config_file as DEFAULT_CONFIG_FILE
-from tensorforce_benchmark.benchmark.runner import TensorForceBenchmarkRunner
-from tensorforce_benchmark.db import LocalDatabase, WebDatabase
-from tensorforce_benchmark.cli.util import load_config
+from rl_benchmark import default_config_file as DEFAULT_CONFIG_FILE
+from rl_benchmark.db import LocalDatabase, WebDatabase
+from rl_benchmark.cli.util import load_config
+from rl_benchmark.libraries import libraries
 
 
 logging.basicConfig(level=logging.INFO)
@@ -103,6 +105,7 @@ def main():
                         help="Don't save results into local benchmark database.")
     parser.add_argument('-P', '--push', action='store_true', default=False,
                         help="Push results to web database.")
+    parser.add_argument('-R', '--rl_library', default='yarl', help="RL library to run benchmark on.")
     parser.add_argument('-o', '--output', help="output file (pickle pkl)")
     parser.add_argument('-a', '--append', action='store_true', default=False,
                         help="Append data to existing pickle file?")
@@ -121,7 +124,13 @@ def main():
 
     root = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
 
-    benchmark_runner = TensorForceBenchmarkRunner(
+    if not args.rl_library in libraries:
+        logger.error("No such library: {} (choose one of {}).".format(args.rl_library, ', '.join(libraries.keys())))
+        return 1
+
+    rl_library_class = libraries[args.rl_library]
+
+    benchmark_runner = rl_library_class(
         config_folder=os.path.join(root, 'configs'),
         output_folder=os.path.join(root, 'benchmarks')
     )
@@ -197,6 +206,7 @@ def main():
         benchmark_runner.save_results_file(output_file=output_path, append=args.append, force=args.force)
 
     return 0
+
 
 if __name__ == '__main__':
     sys.exit(main())
