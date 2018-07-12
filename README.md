@@ -16,7 +16,7 @@ You can easily create benchmarks using pre-supplied config files or your own con
 are stored in a local (sqlite) database.
 
 ```bash
-python scripts/benchmark_gym.py [--output output] [--experiments num_experiments] [--append] [--model <path>] [--save-model <num_episodes>] [--load-model <path>] [--history <file>] [--history-episodes <num_episodes>] [--load-history <file>] [--library library] <algorithm> <gym_id>
+python scripts/benchmark_gym.py [--output output] [--experiments num_experiments] [--append] [--model <path>] [--save-model <num_episodes>] [--load-model <path>] [--history <file>] [--history-episodes <num_episodes>] [--load-history <file>] [--rl_library rl_library] <algorithm> <gym_id>
 ```
 
 `algorithm` specifies which config file to use. You can pass the path to a valid json config file, or a string
@@ -24,7 +24,7 @@ indicating which prepared config to use (e.g. `tensorforce/dqn2015`).
 
 `gym_id` should be a valid [OpenAI gym ID](https://gym.openai.com/envs)
 
-`library` is the RL library to use, for instance `yarl` or `tensorforce`.
+`rl_library` is the RL library to use, for instance `yarl` or `tensorforce`.
 
 `output` is an optional parameter to set the output (pickle) file. If omitted, output will be saved in `./benchmarks`.
 
@@ -90,13 +90,13 @@ docker pull yarlproject/rl-benchmark
 Afterwards, you can start your benchmark. You should provide a host directory for the output files:
 
 ```bash
-docker run -v /host/output:/benchmarks yarlproject/rl-benchmark --library tensorforce tensorforce/ppo_cartpole CartPole-v0
+docker run -v /host/output:/benchmarks yarlproject/rl-benchmark --rl_library tensorforce tensorforce/ppo_cartpole CartPole-v0
 ```
 
 To provide your own configuration files, you can mount another host directory and pass the configuration file name as a parameter:
 
 ```bash
-docker run -v /host/configs:/configs -v /host/output:/benchmarks yarlproject/rl-benchmark --library tensorforce my_config CartPole-v0
+docker run -v /host/configs:/configs -v /host/output:/benchmarks yarlproject/rl-benchmark --rl_library tensorforce my_config CartPole-v0
 ```
 
 ### Using tensorflow-gpu
@@ -112,7 +112,7 @@ docker pull rlcore/rl-benchmark:latest-gpu
 Then, run using `nvidia-docker`:
 
 ```bash
-nvidia-docker run -v /host/configs:/configs -v /host/output:/benchmarks yarlproject/rl-benchmark:latest-gpu --library tensorforce my_config CartPole-v0
+nvidia-docker run -v /host/configs:/configs -v /host/output:/benchmarks yarlproject/rl-benchmark:latest-gpu --rl_library tensorforce my_config CartPole-v0
 ```
 
 ### Building Docker images
