@@ -4,6 +4,10 @@ rl-benchmark: Reinforcement learning benchmarking.
 In this repository we provide scripts for creating and analyzing benchmarks
  of reinforcement learning algorithm implementations.
  
+*Important note*: This is the successor project to `tensorforce-benchmark`. It still supports running benchmarks on
+the tensorforce reinforcement learning library. We plan to support further libraries or baseline implementations, such
+as OpenAI baselines, tensorflow agents, or YARL.
+
 
 Creating benchmarks
 -------------------
@@ -12,13 +16,15 @@ You can easily create benchmarks using pre-supplied config files or your own con
 are stored in a local (sqlite) database.
 
 ```bash
-python scripts/benchmark_gym.py [--output output] [--experiments num_experiments] [--append] [--model <path>] [--save-model <num_episodes>] [--load-model <path>] [--history <file>] [--history-episodes <num_episodes>] [--load-history <file>] <algorithm> <gym_id>
+python scripts/benchmark_gym.py [--output output] [--experiments num_experiments] [--append] [--model <path>] [--save-model <num_episodes>] [--load-model <path>] [--history <file>] [--history-episodes <num_episodes>] [--load-history <file>] [--library library] <algorithm> <gym_id>
 ```
 
 `algorithm` specifies which config file to use. You can pass the path to a valid json config file, or a string
-indicating which prepared config to use (e.g. `dqn2015`).
+indicating which prepared config to use (e.g. `tensorforce/dqn2015`).
 
 `gym_id` should be a valid [OpenAI gym ID](https://gym.openai.com/envs)
+
+`library` is the RL library to use, for instance `yarl` or `tensorforce`.
 
 `output` is an optional parameter to set the output (pickle) file. If omitted, output will be saved in `./benchmarks`.
 
@@ -117,4 +123,3 @@ docker build -f Dockerfile -t rl-benchmark:latest .
 # GPU version
 nvidia-docker build -f Dockerfile.gpu -t rl-benchmark:latest-gpu .
 ```
-
