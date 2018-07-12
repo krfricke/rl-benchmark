@@ -27,7 +27,7 @@ class EnvironmentWrapper(object):
     """
     def __init__(self, env):
         self.env = env
-        self.episode_end_callbacks = set()
+        self.episode_end_callbacks = list()
 
     def reset(self):
         return self.env.reset()
@@ -35,5 +35,12 @@ class EnvironmentWrapper(object):
     def close(self):
         return self.env.close()
 
-    def add_episode_end_callback(self, callback):
-        self.episode_end_callbacks.add(callback)
+    def add_episode_end_callback(self, callback, *args, **kwargs):
+        self.episode_end_callbacks.append((callback, args, kwargs))
+
+    def call_episode_end_callbacks(self):
+        for (callback, args, kwargs) in self.episode_end_callbacks:
+            callback(*args, **kwargs)
+
+    def __getattr__(self, item):
+        return self.env.__getattribute__(item)

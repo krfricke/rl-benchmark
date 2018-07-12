@@ -60,6 +60,7 @@ class BenchmarkRunner(object):
 
         self.environment_domain = 'user'
         self.environment_name = None
+        self.environment_callback = None
 
     def load_config(self, filename):
         """
@@ -91,14 +92,22 @@ class BenchmarkRunner(object):
         Set environment and store as callback.
 
         Args:
-            environment: Environment object
+            environment: Environment object or name.
             *args: arguments to pass to environment class constructor
             **kwargs: keyword arguments to pass to environment class constructor
 
         Returns:
 
         """
-        raise NotImplementedError
+        self.environment_callback = (environment, args, kwargs)
+
+        if (isinstance(environment, str) and environment == 'openai_gym') or \
+        environment.__name__ == 'OpenAIGym':
+            self.environment_domain = 'openai_gym'
+            self.environment_name = args[0]
+        else:
+            self.environment_domain = 'user'
+            self.environment_name = environment.__name__
 
     def make_environment(self):
         """
@@ -107,7 +116,14 @@ class BenchmarkRunner(object):
         Returns: environment
 
         """
-        raise NotImplementedError
+        (environment_class, environment_args, environment_kwargs) = self.environment_callback
+
+        if isinstance(environment_class, str):
+            raise NotImplementedError("There is no general method for the creation of a string environment.")
+
+        environment = environment_class(*environment_args, **environment_kwargs)
+
+        return environment
 
     def run_experiment(self, environment, experiment_num=0):
         """

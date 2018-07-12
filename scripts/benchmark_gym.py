@@ -79,7 +79,7 @@ import logging
 import os
 import sys
 
-from tensorforce.contrib.openai_gym import OpenAIGym  # Todo: use own environment wrapper? Or switch to yarl?
+
 
 from rl_benchmark import default_config_file as DEFAULT_CONFIG_FILE
 from rl_benchmark.db import LocalDatabase, WebDatabase
@@ -88,6 +88,8 @@ from rl_benchmark.libraries import libraries
 
 
 logging.basicConfig(level=logging.INFO)
+root_logger = logging.getLogger('')
+root_logger.setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
@@ -170,7 +172,7 @@ def main():
     if args.load_history:
         benchmark_runner.load_history(args.load_history)
 
-    benchmark_runner.set_environment(OpenAIGym, args.gym_id)
+    benchmark_runner.set_environment('openai_gym', args.gym_id)
 
     benchmark_runner.run(
         experiments=args.experiments,

@@ -1,0 +1,46 @@
+{
+    "type": "dqn",
+    "max_episodes": 500,
+    "max_episode_timesteps": 200,
+
+    "memory_spec": {
+        "type": "replay",
+        "capacity": 128
+    },
+
+    "preprocessing_spec": [],
+
+    "network_spec": [
+        {
+            "type": "dense",
+            "units": 20,
+            "activation": "tanh",
+            "scope": "hidden"
+        }
+    ],
+
+    "exploration_spec": {
+        "non_explore_behavior": "max-likelihood",
+        "epsilon_spec": {
+            "decay_spec": {
+                "type": "linear_decay",
+                "from": 1.0,
+                "to": 0.05,
+                "start_timestep": 0,
+                "num_timesteps": 1500
+            }
+        }
+    },
+
+    "update_spec": {
+        "do_updates": true,
+        "update_interval": 4,
+        "batch_size": 16,
+        "synch_interval": 32
+    },
+
+    "optimizer_spec": {
+        "type": "gradient_descent",
+        "learning_rate": 0.001
+    }
+}

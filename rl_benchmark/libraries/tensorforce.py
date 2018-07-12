@@ -27,6 +27,7 @@ from copy import copy
 
 from tensorforce.agents import Agent
 from tensorforce.execution import Runner
+from tensorforce.contrib.openai_gym import OpenAIGym
 
 from tensorflow import __version__ as tensorflow_version
 from tensorforce import __version__ as tensorforce_version
@@ -45,29 +46,20 @@ class TensorForceBenchmarkRunner(BenchmarkRunner):
 
         self.environment_callback = None
 
-    def set_environment(self, environment, *args, **kwargs):
-        """
-        Set environment class and store as callback
-
-        Args:
-            environment: TensorForce.Environment class
-            *args: arguments to pass to environment class constructor
-            **kwargs: keyword arguments to pass to environment class constructor
-
-        Returns:
-
-        """
-        self.environment_callback = (environment, args, kwargs)
-
-        if environment.__name__ == 'OpenAIGym':
-            self.environment_domain = 'openai_gym'
-            self.environment_name = args[0]
-        else:
-            self.environment_domain = 'user'
-            self.environment_name = environment.__name__
-
     def make_environment(self):
+        """
+        Create environment.
+
+        Returns: environment
+
+        """
         (environment_class, environment_args, environment_kwargs) = self.environment_callback
+
+        if isinstance(environment_class, str):
+            if self.environment_domain == 'openai_gym':
+                environment_class = OpenAIGym
+            else:
+                raise NotImplementedError("No method for creating non-gym environment.")
 
         environment = environment_class(*environment_args, **environment_kwargs)
 
