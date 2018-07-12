@@ -78,22 +78,25 @@ Using Docker
 
 We provide a Docker image for benchmarking. The image currently only support creating benchmarks, not analyzing them.
 
+*Note*: The current Docker images only contain the [tensorforce](https://github.com/reinforceio/tensorforce)
+reinforcement learning library.
+
 Get started by pulling our docker image:
 
 ```bash
-docker pull yarl/rl-benchmark
+docker pull yarlproject/rl-benchmark
 ```
 
 Afterwards, you can start your benchmark. You should provide a host directory for the output files:
 
 ```bash
-docker run -v /host/output:/benchmarks yarl/rl-benchmark ppo_cartpole CartPole-v0
+docker run -v /host/output:/benchmarks yarlproject/rl-benchmark --library tensorforce tensorforce/ppo_cartpole CartPole-v0
 ```
 
 To provide your own configuration files, you can mount another host directory and pass the configuration file name as a parameter:
 
 ```bash
-docker run -v /host/configs:/configs -v /host/output:/benchmarks yarl/rl-benchmark my_config CartPole-v0
+docker run -v /host/configs:/configs -v /host/output:/benchmarks yarlproject/rl-benchmark --library tensorforce my_config CartPole-v0
 ```
 
 ### Using tensorflow-gpu
@@ -103,13 +106,13 @@ We also provide a Docker image utilizing `tensorflow-gpu` on CUDA. You will need
 First, pull the gpu image:
 
 ```bash
-docker pull yarl/rl-benchmark:latest-gpu
+docker pull rlcore/rl-benchmark:latest-gpu
 ```
 
 Then, run using `nvidia-docker`:
 
 ```bash
-nvidia-docker run -v /host/configs:/configs -v /host/output:/benchmarks yarl/rl-benchmark:latest-gpu my_config CartPole-v0
+nvidia-docker run -v /host/configs:/configs -v /host/output:/benchmarks yarlproject/rl-benchmark:latest-gpu --library tensorforce my_config CartPole-v0
 ```
 
 ### Building Docker images
