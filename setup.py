@@ -36,7 +36,7 @@ install_requires=[
     'arghandler',
     'pyyaml',
     'tqdm>=4.11.0',
-    'tensorforce>=0.3.2'
+    'tensorforce>=0.3.5'
 ]
 
 setup_requires=[
@@ -52,7 +52,7 @@ setup(name='rl_benchmark',
       version=version_vars['__version__'],
       description='Reinforcement learning benchmarking package',
       url='http://github.com/yarl-project/rl-benchmark',
-      author='reinforce.io',
+      author='yarl',
       author_email='dev@yarl-project.org',
       license='Apache 2.0',
       packages=[package for package in find_packages() if package.startswith('rl_benchmark')],
