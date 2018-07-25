@@ -1,4 +1,4 @@
-# Copyright 2018 The YARL Project. All Rights Reserved.
+# Copyright 2018 The RLgraph project. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -51,9 +51,9 @@ extras_require = {
 setup(name='rl_benchmark',
       version=version_vars['__version__'],
       description='Reinforcement learning benchmarking package',
-      url='http://github.com/yarl-project/rl-benchmark',
-      author='yarl',
-      author_email='dev@yarl-project.org',
+      url='http://github.com/rlgraph/rl-benchmark',
+      author='RLcore',
+      author_email='dev@rlcore.ai',
       license='Apache 2.0',
       packages=[package for package in find_packages() if package.startswith('rl_benchmark')],
       install_requires=install_requires,

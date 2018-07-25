@@ -1,4 +1,4 @@
-# Copyright 2018 The YARL Project. All Rights Reserved.
+# Copyright 2018 The RLgraph project. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,8 +33,8 @@ from rl_benchmark.data import BenchmarkData
 
 
 class BenchmarkRunner(object):
-    rl_library = 'none'           # E.g. yarl
-    rl_library_version = '0.0.0'  # E.g. yaral version
+    rl_library = 'none'           # E.g. rlgraph
+    rl_library_version = '0.0.0'  # E.g. rlgraph version
     rl_backend = 'none'           # E.g. tensorflow
     rl_backend_version = '0.0.0'  # E.g. tensorflow version
 

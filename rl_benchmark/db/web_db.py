@@ -1,4 +1,4 @@
-# Copyright 2018 The YARL Project. All Rights Reserved.
+# Copyright 2018 The RLgraph project. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ API_VERSION = 'api/v1'
 
 class WebDatabase(BenchmarkDatabase):
     def __init__(self,
-                 webdb_url='https://benchmarks.yarl-project.org',
+                 webdb_url='https://benchmarks.rlcore.ai',
                  webdb_cache='~/.cache/rl-benchmark/webdb/',
                  auth_method='anonymous',
                  auth_credentials=None,

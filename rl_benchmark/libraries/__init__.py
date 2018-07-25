@@ -1,4 +1,4 @@
-# Copyright 2018 The YARL Project. All Rights Reserved.
+# Copyright 2018 The RLgraph project. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,12 +17,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from rl_benchmark.libraries.yarl import YarlBenchmarkRunner
+from rl_benchmark.libraries.rlgraph import RLgraphBenchmarkRunner
 from rl_benchmark.libraries.tensorforce import TensorForceBenchmarkRunner
 
-__all__ = ['YarlBenchmarkRunner', 'TensorForceBenchmarkRunner']
+__all__ = ['RLgraphBenchmarkRunner', 'TensorForceBenchmarkRunner']
 
 libraries = dict(
-    yarl=YarlBenchmarkRunner,
+    rlgraph=RLgraphBenchmarkRunner,
     tensorforce=TensorForceBenchmarkRunner
 )

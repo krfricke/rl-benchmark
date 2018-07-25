@@ -1,6 +1,6 @@
 FROM tensorflow/tensorflow:latest-gpu
 
-MAINTAINER YARL-Project <dev@yarl-project.org>
+MAINTAINER RLcore <dev@rlcore.ai>
 
 # Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \

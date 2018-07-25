@@ -1,4 +1,4 @@
-# Copyright 2018 The YARL Project. All Rights Reserved.
+# Copyright 2018 The RLgraph project. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # ==============================================================================
 
 """
-YARL benchmarking.
+RLgraph benchmarking.
 """
 
 from __future__ import absolute_import
@@ -26,20 +26,20 @@ import time
 
 from tensorflow import __version__ as tensorflow_version
 
-from yarl import __version__ as yarl_version
+from rlgraph import __version__ as rlgraph_version
 from copy import copy
 
 from rl_benchmark.benchmark.runner.benchmark_runner import BenchmarkRunner
 from rl_benchmark.benchmark.wrapper.results_wrapper import ResultsWrapper
 
-from yarl.agents import Agent
-from yarl.envs import OpenAIGymEnv
-from yarl.execution.single_threaded_worker import SingleThreadedWorker
+from rlgraph.agents import Agent
+from rlgraph.envs import OpenAIGymEnv
+from rlgraph.execution.single_threaded_worker import SingleThreadedWorker
 
 
-class YarlEnvironmentWrapper(ResultsWrapper):
+class RLgraphEnvironmentWrapper(ResultsWrapper):
     """
-    YARL's environment don't support end-of-episode callbacks by default, so we introduce them by wrapping
+    RLgraph's environment don't support end-of-episode callbacks by default, so we introduce them by wrapping
     the environment objects.
     """
     def step(self, *args, **kwargs):
@@ -60,14 +60,14 @@ class YarlEnvironmentWrapper(ResultsWrapper):
         return state, reward, terminal, info
 
 
-class YarlBenchmarkRunner(BenchmarkRunner):
-    rl_library = 'yarl'
-    rl_library_version = yarl_version
+class RLgraphBenchmarkRunner(BenchmarkRunner):
+    rl_library = 'rlgraph'
+    rl_library_version = rlgraph_version
     rl_backend = 'tensorflow'
     rl_backend_version = tensorflow_version
 
     def __init__(self, config=None, config_folder=None, output_folder='/tmp'):
-        super(YarlBenchmarkRunner, self).__init__(config, config_folder, output_folder)
+        super(RLgraphBenchmarkRunner, self).__init__(config, config_folder, output_folder)
 
         self.environment_callback = None
 
@@ -93,7 +93,7 @@ class YarlBenchmarkRunner(BenchmarkRunner):
         return environment
 
     def run_experiment(self, environment, experiment_num=0):
-        environment = YarlEnvironmentWrapper(environment)
+        environment = RLgraphEnvironmentWrapper(environment)
         environment.add_episode_end_callback(self.episode_finished, environment, runner_id=1)
 
         config = copy(self.config)

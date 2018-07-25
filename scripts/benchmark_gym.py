@@ -1,4 +1,4 @@
-# Copyright 2018 The YARL Project. All Rights Reserved.
+# Copyright 2018 The RLgraph project. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ indicating which prepared config to use (e.g. `dqn2015`).
 
 `gym_id` should be a valid [OpenAI gym ID](https://gym.openai.com/envs)
 
-`rl_library` should be the library you want to use for benchmarking (e.g. yarl).
+`rl_library` should be the library you want to use for benchmarking (e.g. rlgraph).
 
 `output` is an optional parameter to set the output (pickle) file. If omitted, output will be saved in `./benchmarks`.
 
@@ -107,7 +107,7 @@ def main():
                         help="Don't save results into local benchmark database.")
     parser.add_argument('-P', '--push', action='store_true', default=False,
                         help="Push results to web database.")
-    parser.add_argument('-R', '--rl_library', default='yarl', help="RL library to run benchmark on.")
+    parser.add_argument('-R', '--rl_library', default='rlgraph', help="RL library to run benchmark on.")
     parser.add_argument('-o', '--output', help="output file (pickle pkl)")
     parser.add_argument('-a', '--append', action='store_true', default=False,
                         help="Append data to existing pickle file?")
