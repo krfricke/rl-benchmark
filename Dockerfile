@@ -1,6 +1,6 @@
 FROM tensorflow/tensorflow:latest
 
-MAINTAINER RLcore <dev@rlcore.ai>
+MAINTAINER RLgraph <dev@rlgraph.org>
 
 # Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
