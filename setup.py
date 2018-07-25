@@ -48,7 +48,7 @@ extras_require = {
 
 }
 
-setup(name='rl_benchmark',
+setup(name='rl-benchmark',
       version=version_vars['__version__'],
       description='Reinforcement learning benchmarking package',
       url='http://github.com/rlgraph/rl-benchmark',
