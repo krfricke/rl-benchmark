@@ -33,7 +33,7 @@ from rl_benchmark.benchmark.runner.benchmark_runner import BenchmarkRunner
 from rl_benchmark.benchmark.wrapper.results_wrapper import ResultsWrapper
 
 from rlgraph.agents import Agent
-from rlgraph.envs import OpenAIGymEnv
+from rlgraph.environments import OpenAIGymEnv
 from rlgraph.execution.single_threaded_worker import SingleThreadedWorker
 
 
